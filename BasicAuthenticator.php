@@ -16,6 +16,8 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
 
   const UMN_ATTRS_FROM_ENV = 'from_environment';
   const UMN_ATTRS_FROM_HEADERS = 'from_headers';
+  
+  const UMN_SESSION_MAX_AGE = 10800;
 
   private $attributeSource = self::UMN_ATTRS_FROM_ENV;
 
@@ -36,7 +38,6 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     'umndid'
   );
 
-  private $maxAge = 10800;
   
   public function __construct()
   {
@@ -168,8 +169,8 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    * @access public
    * @return bool
    */
-  public function hasSessionTimedOut($maxAge = 10800)
-  {
+  public function hasSessionTimedOut($maxAge = UMN_SESSION_MAX_AGE)
+  { 
     // If no session can be found, just return
     if (!$this->hasSession()) {
       return true;
