@@ -58,7 +58,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     $loginBase = $this->getBaseURL();
     $loginTarget = !empty($options['target']) ? urlencode($options['target']) : urlencode($loginBase . $_SERVER['REQUEST_URI']);
 
-    $loginURL = $loginBase . $this->handlerURL . "?$loginTarget";
+    $loginURL = $loginBase . $this->handlerURL . "?target=$loginTarget";
 
     if (isset($options['passive']) && $options['passive'] == true) {
       $loginURL .= "&isPassive=true";
@@ -67,7 +67,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
       $loginURL .= "&forceAuthn=true";
     }
     if (isset($options['mkey']) && $options['mkey'] == true) {
-      $loginURL .= "&authenContextClassRef=" . urlencode(UMN_MKEY_AUTHN_CONTEXT);
+      $loginURL .= "&authenContextClassRef=" . urlencode(self::UMN_MKEY_AUTHN_CONTEXT);
     }
     if (isset($options['authenContextClassRef']) && !empty($options['authenContextClassRef'])) {
       $loginURL .= "&authenContextClassRef=" . urlencode($options['authenContextClassRef']);
@@ -136,10 +136,10 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    * @return string
    */
   public function getIdPEntityId() {
-    if ($this->getAttributeAccessMethod() == UMN_ATTRS_FROM_ENV) {
+    if ($this->getAttributeAccessMethod() == self::MN_ATTRS_FROM_ENV) {
       return $_SERVER['Shib-Identity-Provider'];
     }
-    else if ($this->getAttributeAccessMethod() == UMN_ATTRS_FROM_HEADERS) {
+    else if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_HEADERS) {
       return $_SERVER['HTTP_SHIB_IDENTITY_PROVIDER'];
     }
     return null;
@@ -153,10 +153,10 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   public function hasSession() {
     $idps = array(self::UMN_IDP_ENTITY_ID, self::UMN_TEST_IDP_ENTITY_ID, self::UMN_SPOOF_IDP_ENTITY_ID);
 
-    if ($this->getAttributeAccessMethod() == UMN_ATTRS_FROM_ENV) {
+    if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_ENV) {
       return in_array($this->getIdPEntityId, $idps);
     }
-    if ($this->getAttributeAccessMethod() == UMN_ATTRS_FROM_HEADERS) {
+    if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_HEADERS) {
       return in_array($this->getIdPEntityId, $idps);
     }
     return false;
@@ -186,10 +186,10 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
 
   public function loggedInSince() {
-    if ($this->getAttributeAccessMethod() == UMN_ATTRS_FROM_ENV) {
+    if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_ENV) {
       $auth_instant = !empty($_SERVER['Shib-Authentication-Instant']) ? $_SERVER['Shib-Authentication-Instant'] : null;
     }
-    else if ($this->getAttributeAccessMethod() == UMN_ATTRS_FROM_HEADERS) {
+    else if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_HEADERS) {
       $auth_instant = !empty($_SERVER['HTTP_SHIB_AUTHENTICATION_INSTANT']) ? $_SERVER['HTTP_SHIB_AUTHENTICATION_INSTANT'] : null;
     }
     // No authentication instant, no session, return true
@@ -221,11 +221,11 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    */
   public function loggedInWithMKey() {
     if ($this->hasSession) {
-      if ($this->getAttributeAccessMethod() == UMN_ATTRS_FROM_ENV) {
-        return $_SERVER['Shib-AuthnContext-Class'] == UMN_MKEY_AUTHN_CONTEXT;
+      if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_ENV) {
+        return $_SERVER['Shib-AuthnContext-Class'] == self::UMN_MKEY_AUTHN_CONTEXT;
       }
       else {
-        return $_SERVER['HTTP_SHIB_AUTHNCONTEXT_CLASS'] == UMN_MKEY_AUTHN_CONTEXT;
+        return $_SERVER['HTTP_SHIB_AUTHNCONTEXT_CLASS'] == self::UMN_MKEY_AUTHN_CONTEXT;
       }
     }
     return false;
@@ -249,6 +249,10 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     else $this->attributeSource = 'apache';
     return $this->attributeSource;
   }
+  public function getDefaultAttributeNames() {}
+  public function getAttributeNames() {}
+  public function getAttributeValues() {}
+  public function getAttributes() {}
 
   /**
    * Handle HTTP redirection
@@ -272,7 +276,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     else return null;
   }
   private function getBaseURL() {
-    return 'https://' . $_SERVER['HTTP_HOST'] . $this->handlerURL;
+    return 'https://' . $_SERVER['HTTP_HOST'];
   }
 
   // Set the path of the handlerURL (default /Shibboleth.sso)
