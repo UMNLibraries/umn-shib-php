@@ -2,11 +2,11 @@
 
 namespace UMNShib;
 
-class ShibbolethAuthenticator
+class BasicAuthenticator implements BasicAuthenticatorInterface
 {
   const UMN_IDP_ENTITY_ID = 'https://idp3.shib.umn.edu/idp/shibboleth';
   const UMN_TEST_IDP_ENTITY_ID = 'https://idp-test.shib.umn.edu/idp/shibboleth';
-  const UMN_SPOOF_IDP_ENTITY_ID = 'https://idp-spoof-test.shib.umn.edu/idp/shibboleth';\
+  const UMN_SPOOF_IDP_ENTITY_ID = 'https://idp-spoof-test.shib.umn.edu/idp/shibboleth';
 
   const UMN_IDP_LOGOUT_URL = 'https://idp2.shib.umn.edu/idp/LogoutUMN';
   const UMN_TEST_IDP_LOGOUT_URL = 'https://idp-test.shib.umn.edu/idp/LogoutUMN';
@@ -52,7 +52,7 @@ class ShibbolethAuthenticator
    */
   public function buildLoginURL(array $options = array())
   {
-    array_merge($this->loginOptions, $options)
+    array_merge($this->loginOptions, $options);
 
     $loginBase = $this->getBaseURL();
     $loginTarget = !empty($options['target']) ? urlencode($options['target']) : urlencode($loginBase . $_SERVER['REQUEST_URI']);
@@ -84,7 +84,7 @@ class ShibbolethAuthenticator
    */
   public function buildLogoutURL(array $options = array())
   {
-    array_merge($this->logoutOptions, $options)
+    array_merge($this->logoutOptions, $options);
 
     $logoutBase = $this->getBaseURL();
 
@@ -93,7 +93,7 @@ class ShibbolethAuthenticator
       $logoutReturn = self::UMN_IDP_LOGOUT_URL;
 
       if (!empty($options['return'])) {
-        $logoutReturn .= "?return={$options['return']}"
+        $logoutReturn .= "?return={$options['return']}";
       }
 
       // The whole return URL is encoded, including the secondary ?return=
@@ -265,7 +265,7 @@ class ShibbolethAuthenticator
     if (stripos($_SERVER['SERVER_SOFTWARE'], 'apache') !== false) {
       return 'apache';
     }
-    else if (stripos($_SERVER['SERVER_SOFTWARE'], 'iis') !== false {
+    else if (stripos($_SERVER['SERVER_SOFTWARE'], 'iis') !== false) {
       return 'iis';
     }
     else return null;
@@ -279,6 +279,5 @@ class ShibbolethAuthenticator
   {
     $this->handlerURL = !empty($handlerURL) ? $handlerURL : "/Shibboleth.sso";
   }
-
 }
 ?>
