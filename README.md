@@ -1,4 +1,3 @@
-umn-shib-php
-============
+#umn-shib-php
 
-PHP API for the umn-community-shib
+A PHP implementation of the UMN Shibboleth Basic API
