@@ -64,6 +64,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
 
     $params = array();
 
+    // Parse explicit and implicit options, build the query string
     // Default to the current URI if no target was supplied
     $params['target'] = !empty($options['target']) ? $options['target'] : $loginBase . $_SERVER['REQUEST_URI'];
 
@@ -84,7 +85,10 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     }
     $query = http_build_query($params);
 
-    $loginURL = $loginBase . $this->handlerURL . "/Login?$query";
+    $loginURL = $loginBase . $this->handlerURL;
+    if (!empty($query)) {
+      $loginURL .= "?$query";
+    }
     return $loginURL;
   }
   
@@ -114,7 +118,12 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
       $params['return'] = $logoutReturn;
     }
 
-    $logoutURL = $logoutBase . $this->handlerURL . '/Logout?' . http_build_query($params);
+    $query = http_build_query($params);
+    $logoutURL = $logoutBase . $this->handlerURL . '/Logout';
+    if (!empty($query)) {
+      $logoutURL .= "?$query";
+    }
+
     return $logoutURL;
   }
 
