@@ -4,7 +4,8 @@ namespace UMNShib;
 
 class BasicAuthenticator implements BasicAuthenticatorInterface
 {
-  const UMN_IDP_ENTITY_ID = 'https://idp3.shib.umn.edu/idp/shibboleth';
+  // API Constants
+  const UMN_IDP_ENTITY_ID = 'https://idp2.shib.umn.edu/idp/shibboleth';
   const UMN_TEST_IDP_ENTITY_ID = 'https://idp-test.shib.umn.edu/idp/shibboleth';
   const UMN_SPOOF_IDP_ENTITY_ID = 'https://idp-spoof-test.shib.umn.edu/idp/shibboleth';
 
@@ -17,7 +18,11 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   const UMN_ATTRS_FROM_ENV = 'from_environment';
   const UMN_ATTRS_FROM_HEADERS = 'from_headers';
   
+  // Extended constants
   const UMN_SESSION_MAX_AGE = 10800;
+  const SERVER_TYPE_IIS = 'iis';
+  const SERVER_TYPE_APACHE = 'apache';
+  const SERVER_TYPE_OTHER = 'other';
 
   private $attributeSource = self::UMN_ATTRS_FROM_ENV;
 
@@ -35,7 +40,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     'uid',
     'eppn',
     'isGuest',
-    'umndid'
+    'umnDID'
   );
 
   
@@ -56,23 +61,30 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     array_merge($this->loginOptions, $options);
 
     $loginBase = $this->getBaseURL();
-    $loginTarget = !empty($options['target']) ? urlencode($options['target']) : urlencode($loginBase . $_SERVER['REQUEST_URI']);
 
-    $loginURL = $loginBase . $this->handlerURL . "?target=$loginTarget";
+    $params = array();
 
+    // Default to the current URI if no target was supplied
+    $params['target'] = !empty($options['target']) ? $options['target'] : $loginBase . $_SERVER['REQUEST_URI'];
+
+    if (isset($options['entityID'])) {
+      $params['entityID'] = $options['entityID'];
+    }
     if (isset($options['passive']) && $options['passive'] == true) {
-      $loginURL .= "&isPassive=true";
+      $params['isPassive'] = 'true';
     }
     if (isset($options['forceAuthn']) && $options['forceAuthn'] == true) {
-      $loginURL .= "&forceAuthn=true";
+      $params['forceAuthn'] = 'true';
     }
     if (isset($options['mkey']) && $options['mkey'] == true) {
-      $loginURL .= "&authenContextClassRef=" . urlencode(self::UMN_MKEY_AUTHN_CONTEXT);
+      $params['authnContextClassRef'] = self::UMN_MKEY_AUTHN_CONTEXT;
     }
-    if (isset($options['authenContextClassRef']) && !empty($options['authenContextClassRef'])) {
-      $loginURL .= "&authenContextClassRef=" . urlencode($options['authenContextClassRef']);
+    if (isset($options['authnContextClassRef']) && !empty($options['authnContextClassRef'])) {
+      $params['authnContextClassRef'] = $options['authnContextClassRef'];
     }
+    $query = http_build_query($params);
 
+    $loginURL = $loginBase . $this->handlerURL . "/Login?$query";
     return $loginURL;
   }
   
@@ -89,19 +101,20 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
 
     $logoutBase = $this->getBaseURL();
 
-    $logoutReturn = '';
+    $params = array();
     if ($options['logoutFromIdP']) {
       $logoutReturn = self::UMN_IDP_LOGOUT_URL;
 
+      // Append the urlencoded final return
       if (!empty($options['return'])) {
         $logoutReturn .= "?return={$options['return']}";
       }
 
       // The whole return URL is encoded, including the secondary ?return=
-      $logoutReturn = '?return=' . urlencode($logoutReturn);
+      $params['return'] = $logoutReturn;
     }
 
-    $logoutURL = $logoutBase . $this->handlerURL . $logoutReturn;
+    $logoutURL = $logoutBase . $this->handlerURL . '/Logout?' . http_build_query($params);
     return $logoutURL;
   }
 
@@ -136,7 +149,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    * @return string
    */
   public function getIdPEntityId() {
-    if ($this->getAttributeAccessMethod() == self::MN_ATTRS_FROM_ENV) {
+    if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_ENV) {
       return $_SERVER['Shib-Identity-Provider'];
     }
     else if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_HEADERS) {
@@ -154,10 +167,10 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     $idps = array(self::UMN_IDP_ENTITY_ID, self::UMN_TEST_IDP_ENTITY_ID, self::UMN_SPOOF_IDP_ENTITY_ID);
 
     if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_ENV) {
-      return in_array($this->getIdPEntityId, $idps);
+      return in_array($this->getIdPEntityId(), $idps);
     }
     if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_HEADERS) {
-      return in_array($this->getIdPEntityId, $idps);
+      return in_array($this->getIdPEntityId(), $idps);
     }
     return false;
   }
@@ -169,7 +182,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    * @access public
    * @return bool
    */
-  public function hasSessionTimedOut($maxAge = UMN_SESSION_MAX_AGE)
+  public function hasSessionTimedOut($maxAge = self::UMN_SESSION_MAX_AGE)
   { 
     // If no session can be found, just return
     if (!$this->hasSession()) {
@@ -184,7 +197,12 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     }
     else return true;
   }
-
+  /**
+   * Returns the Shib-Authentication-Instant as a Unix timestamp
+   * 
+   * @access public
+   * @return integer
+   */
   public function loggedInSince() {
     if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_ENV) {
       $auth_instant = !empty($_SERVER['Shib-Authentication-Instant']) ? $_SERVER['Shib-Authentication-Instant'] : null;
@@ -195,7 +213,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     // No authentication instant, no session, return true
     else $auth_instant = null;
 
-    return $auth_instant;
+    return strtotime($auth_instant);
   }
   /**
    * Returns the current session's attributes or forces a login redirect if no session is present
@@ -220,7 +238,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    * @return bool
    */
   public function loggedInWithMKey() {
-    if ($this->hasSession) {
+    if ($this->hasSession()) {
       if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_ENV) {
         return $_SERVER['Shib-AuthnContext-Class'] == self::UMN_MKEY_AUTHN_CONTEXT;
       }
@@ -230,7 +248,6 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     }
     return false;
   }
-
   /**
    * Return the attribute access method (ENV, or HTTP headers)
    * 
@@ -249,7 +266,16 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     else $this->attributeSource = 'apache';
     return $this->attributeSource;
   }
-  public function getDefaultAttributeNames() {}
+  /**
+   * Return the array of default attribute names
+   * 
+   * @access public
+   * @return array
+   */
+  public function getDefaultAttributeNames()
+  {
+    return $this->attributes;
+  }
   public function getAttributeNames() {}
   public function getAttributeValues() {}
   public function getAttributes() {}
@@ -265,24 +291,43 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     header("Location $url");
     exit();
   }
+  /**
+   * Returns the server type (iis, apache)
+   * 
+   * @access private
+   * @return string
+   */
   private function getServerType()
   {
-    if (stripos($_SERVER['SERVER_SOFTWARE'], 'apache') !== false) {
-      return 'apache';
+    if (stripos($_SERVER['SERVER_SOFTWARE'], self::SERVER_TYPE_APACHE) !== false) {
+      return self::SERVER_TYPE_APACHE;
     }
-    else if (stripos($_SERVER['SERVER_SOFTWARE'], 'iis') !== false) {
-      return 'iis';
+    else if (stripos($_SERVER['SERVER_SOFTWARE'], self::SERVER_TYPE_IIS) !== false) {
+      return self::SERVER_TYPE_IIS;
     }
-    else return null;
+    else return self::SERVER_TYPE_OTHER;
   }
+  /**
+   * Return the base URL, protocol and hostname, up to but not including the REQUEST_URI
+   * 
+   * @access private
+   * @return string
+   */
   private function getBaseURL() {
     return 'https://' . $_SERVER['HTTP_HOST'];
   }
 
-  // Set the path of the handlerURL (default /Shibboleth.sso)
+  /**
+   * Set the path of the handlerURL (default /Shibboleth.sso) and return it
+   * 
+   * @param mixed $handlerURL 
+   * @access private
+   * @return string
+   */
   private function setHandlerURL($handlerURL)
   {
     $this->handlerURL = !empty($handlerURL) ? $handlerURL : "/Shibboleth.sso";
+    return $this->handlerURL;
   }
 }
 ?>
