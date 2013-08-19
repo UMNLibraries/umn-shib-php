@@ -158,13 +158,11 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    * @return string
    */
   public function getIdPEntityId() {
-    if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_ENV) {
-      return $_SERVER['Shib-Identity-Provider'];
+    $name = 'Shib-Identity-Provider';
+    if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_HEADERS) {
+      $name = self::convertToHTTPHeaderName($name);
     }
-    else if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_HEADERS) {
-      return $_SERVER['HTTP_SHIB_IDENTITY_PROVIDER'];
-    }
-    return null;
+    return !empty($_SERVER[$name]) ? $_SERVER[$name] : null;
   }
   /**
    * Returns true if the Shib-Identity-Provider is non-empty and one of our 3 expected values
