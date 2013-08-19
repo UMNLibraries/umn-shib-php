@@ -2,6 +2,8 @@
 
 namespace UMNShib;
 
+require_once('BasicAuthenticatorInterface.php');
+
 class BasicAuthenticator implements BasicAuthenticatorInterface
 {
   // API Constants
@@ -58,7 +60,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    */
   public function buildLoginURL(array $options = array())
   {
-    array_merge($this->loginOptions, $options);
+    $options = array_merge($this->loginOptions, $options);
 
     $loginBase = $this->getBaseURL();
 
@@ -85,7 +87,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     }
     $query = http_build_query($params);
 
-    $loginURL = $loginBase . $this->handlerURL;
+    $loginURL = $loginBase . $this->handlerURL . '/Login';
     if (!empty($query)) {
       $loginURL .= "?$query";
     }
@@ -101,7 +103,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    */
   public function buildLogoutURL(array $options = array())
   {
-    array_merge($this->logoutOptions, $options);
+    $options = array_merge($this->logoutOptions, $options);
 
     $logoutBase = $this->getBaseURL();
 
@@ -196,13 +198,12 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
       return true;
     }
 
-    $auth_instant = $this->loggedInSince();
-    if ($auth_instant) {
-      $auth_instant_ts = strtotime($auth_instant);
-      // Timestamp of auth plus maxAge is later than current time
+    $auth_instant_ts = $this->loggedInSince();
+    if ($auth_instant_ts) {
+      // Timestamp of auth plus maxAge is earlier than current time
       return $auth_instant_ts + $maxAge < time();
     }
-    else return true;
+    else return false;
   }
   /**
    * Returns the Shib-Authentication-Instant as a Unix timestamp
@@ -267,11 +268,26 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
       return $this->attributeSource;
     }
 
-    if ($this->getServerType() == 'iis') {
-      $this->attributeSource = 'iis';
+    if ($this->getServerType() == self::SERVER_TYPE_IIS) {
+      $this->attributeSource = self::UMN_ATTRS_FROM_HEADERS;
     }
-    else $this->attributeSource = 'apache';
+    else $this->attributeSource = self::UMN_ATTRS_FROM_HEADERS;
     return $this->attributeSource;
+  }
+  /**
+   * Set the attribute access method, allows us to force the use of HTTP headers even absent 
+   * their having been populated by ShibUseHeaders
+   * 
+   * @param mixed $accessMethod 
+   * @access public
+   * @return bool
+   */
+  public function setAttributeAccessMethod($accessMethod)
+  {
+    if (!in_array($accessMethod, array(self::UMN_ATTRS_FROM_ENV, self::UMN_ATTRS_FROM_HEADERS))) {
+      throw new \InvalidArgumentException("Unknown attribute source");
+    }
+    $this->attributeSource = $accessMethod;
   }
   /**
    * Return the array of default attribute names
@@ -382,12 +398,22 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    * Set the path of the handlerURL (default /Shibboleth.sso) and return it
    * 
    * @param mixed $handlerURL 
-   * @access private
+   * @access public
    * @return string
    */
-  private function setHandlerURL($handlerURL)
+  public function setHandlerURL($handlerURL)
   {
     $this->handlerURL = !empty($handlerURL) ? $handlerURL : "/Shibboleth.sso";
+    return $this->handlerURL;
+  }
+  /**
+   * Return the current handlerURL fragment  like /Shibboleth.sso
+   * 
+   * @access public
+   * @return string
+   */
+  public function getHandlerURL()
+  {
     return $this->handlerURL;
   }
   /**
