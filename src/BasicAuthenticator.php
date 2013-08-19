@@ -285,9 +285,63 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   {
     return $this->attributes;
   }
-  public function getAttributeNames() {}
-  public function getAttributeValues() {}
-  public function getAttributes() {}
+  /**
+   * getAttributeNames
+   * 
+   * @param array $requestedAttributes 
+   * @access public
+   * @return array
+   */
+  public function getAttributeNames($requestedAttributes = array()) {
+    return array_merge($this->attributes, $requestedAttributes);
+  }
+  /**
+   * Return an attribute value
+   * 
+   * @param string $name 
+   * @access public
+   * @return string
+   */
+  public function getAttributeValue($name) {
+    $value = null;
+    if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_HEADERS) {
+      $name = self::convertToHTTPHeaderName($name);
+    }
+    return !empty($_SERVER[$name]) ? $_SERVER[$name] : null;
+  }
+  /**
+   * Return an array of values from a delimited, multi-value attribute
+   * 
+   * @param mixed $name 
+   * @access public
+   * @return array
+   */
+  public function getAttributeValues($name) {
+    $value = null;
+    if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_HEADERS) {
+      $name = self::convertToHTTPHeaderName($name);
+
+      if (!empty($_SERVER[$name])) $value = explode(';', $_SERVER[$name]);
+    }
+    return $value;
+  }
+  /**
+   * getAttributes
+   * 
+   * @param array $requestedAttributes 
+   * @access public
+   * @return array
+   */
+  public function getAttributes($requestedAttributes = array()) {
+    $attrs = array_flip(array_merge($this->attributes, $requestedAttributes));
+    foreach ($attrs as $key => $value) {
+      if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_HEADERS) {
+        $key = self::convertToHTTPHeaderName($key);
+      }
+      $attrs[$key] = isset($_SERVER[$key]) ? $_SERVER[$key] : null;
+    }
+    return $attrs;
+  }
 
   /**
    * Handle HTTP redirection
@@ -297,7 +351,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    * @return void
    */
   private function redirect($url) {
-    header("Location $url");
+    header("Location: $url");
     exit();
   }
   /**
@@ -337,6 +391,17 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   {
     $this->handlerURL = !empty($handlerURL) ? $handlerURL : "/Shibboleth.sso";
     return $this->handlerURL;
+  }
+  /**
+   * Return a string representing the HTTP header corresponding to the input $shibProperty
+   * This means replacing hyphens with underscores and prepending HTTP_
+   * 
+   * @param mixed $shibProperty 
+   * @access private
+   * @return bool
+   */
+  private static function convertToHTTPHeaderName($shibProperty) {
+    return 'HTTP_' . strtoupper(str_replace('-', '_', $shibProperty));
   }
 }
 ?>
