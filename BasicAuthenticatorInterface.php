@@ -1,6 +1,6 @@
 <?php
 
-namespace UMNShib;
+namespace UMNShib\BasicAuthenticator;
 
 Interface BasicAuthenticatorInterface
 {
