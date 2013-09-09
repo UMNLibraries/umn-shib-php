@@ -1,3 +1,3 @@
 <?php
-define('APPDIR', __DIR__ . '/../src');
+define('APPDIR', __DIR__ . '/..');
 ?>
