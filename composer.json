@@ -1,5 +1,5 @@
 {
-    "name": "umn-community-shib/umn-shib-php",
+    "name": "umn-community-shib/basic-authenticator",
     "description": "A PHP implementation of the UMN Community Shibboleth basic authentication API",
     "authors": [
         {
