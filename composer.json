@@ -1,0 +1,14 @@
+{
+    "name": "umn-community-shib/umn-shib-php",
+    "description": "A PHP implementation of the UMN Community Shibboleth basic authentication API",
+    "authors": [
+        {
+            "name": "Michael Berkowski",
+            "email": "mjb@umn.edu"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+      "php": ">=5.3.0"
+    }
+}

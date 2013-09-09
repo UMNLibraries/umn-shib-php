@@ -26,46 +26,77 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   const SERVER_TYPE_APACHE = 'apache';
   const SERVER_TYPE_OTHER = 'other';
 
-  private $attributeSource = self::UMN_ATTRS_FROM_ENV;
-
-  private $handlerURL = '/Shibboleth.sso';
-
-  private $loginOptions = array();
-
-  private $logoutOptions = array(
+  /**
+   * From what source are attributes read (HTTP_SHIB_ headers or environment variables)?
+   * Values should be self::UMN_ATTRS_FROM_ENV, self::UMN_ATTRS_FROM_HEADERS
+   * 
+   * @var mixed
+   * @access protected
+   */
+  protected $attributeSource = self::UMN_ATTRS_FROM_ENV;
+  /**
+   * URI path of the Shibboleth SessionInitiator
+   * Default '/Shibboleth.sso'
+   * 
+   * @var string
+   * @access protected
+   */
+  protected $handlerURL = '/Shibboleth.sso';
+  /**
+   * Default login options
+   * 
+   * @var array
+   * @access protected
+   */
+  protected $loginOptions = array();
+  /**
+   * Default logout options
+   * 
+   * @var array
+   * @access protected
+   */
+  protected $logoutOptions = array(
     'return' => null,
     'logoutFromIdP' => true,
     'IdPLogoutURL' => self::UMN_IDP_ENTITY_ID
   );
-
-  private $attributes = array(
+  /**
+   * Default attributes supplied by UMN IdP
+   * 
+   * @var array
+   * @access protected
+   */
+  protected $attributes = array(
     'uid',
     'eppn',
     'isGuest',
     'umnDID'
   );
-
   
-  public function __construct()
+  public function __construct($loginOptions = array(), $logoutOptions = array())
   {
-
+    // Login/Logout options may be supplied in the constructor
+    if (is_array($loginOptions)) {
+      $this->loginOptions = array_merge($this->loginOptions, $loginOptions);
+    }
+    if (is_array($logoutOptions)) {
+      $this->logoutOptions = array_merge($this->logoutOptions, $logoutOptions);
+    }
   }
-
   /**
    * Construct a Session Initiator URL based on options
    * 
-   * @param array $options Associative array of options
+   * @param array $options Associative array of options will be merged with defaults or options supplied in the constructor
    * @access public
    * @return string
    */
   public function buildLoginURL(array $options = array())
   {
+    $loginBase = $this->getBaseURL();
+    // Input options merge/overwrite default options
     $options = array_merge($this->loginOptions, $options);
 
-    $loginBase = $this->getBaseURL();
-
     $params = array();
-
     // Parse explicit and implicit options, build the query string
     // Default to the current URI if no target was supplied
     $params['target'] = !empty($options['target']) ? $options['target'] : $loginBase . $_SERVER['REQUEST_URI'];
@@ -93,19 +124,18 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     }
     return $loginURL;
   }
-  
   /**
    * Construct a logout URL based on options
    * 
-   * @param array $options
+   * @param array $options Associative array of options will be merged with defaults or options supplied in the constructor
    * @access public
    * @return string
    */
   public function buildLogoutURL(array $options = array())
   {
-    $options = array_merge($this->logoutOptions, $options);
-
     $logoutBase = $this->getBaseURL();
+    // Input options merge/overwrite default logout options
+    $options = array_merge($this->logoutOptions, $options);
 
     $params = array();
     if ($options['logoutFromIdP']) {
@@ -125,10 +155,8 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     if (!empty($query)) {
       $logoutURL .= "?$query";
     }
-
     return $logoutURL;
   }
-
   /**
    * Redirect to a login URL, calls buildLoginURL()
    * 
@@ -140,7 +168,6 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   {
     $this->redirect($this->buildLoginURL($options));
   }
-
   /**
    * Redirect to a logout URL, calls buildLogoutURL()
    * 
@@ -152,7 +179,6 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   {
     $this->redirect($this->buildLogoutURL($options));
   }
-
   /**
    * Returns the Shib-Identity-Provider if non-empty
    * 
@@ -334,9 +360,8 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     $value = null;
     if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_HEADERS) {
       $name = self::convertToHTTPHeaderName($name);
-
-      if (!empty($_SERVER[$name])) $value = explode(';', $_SERVER[$name]);
     }
+    if (!empty($_SERVER[$name])) $value = explode(';', $_SERVER[$name]);
     return $value;
   }
   /**
@@ -356,44 +381,26 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     }
     return $attrs;
   }
-
   /**
-   * Handle HTTP redirection
+   * Return the currently configured login options
    * 
-   * @param string $url
-   * @access private
-   * @return void
+   * @access public
+   * @return array
    */
-  private function redirect($url) {
-    header("Location: $url");
-    exit();
-  }
-  /**
-   * Returns the server type (iis, apache)
-   * 
-   * @access private
-   * @return string
-   */
-  private function getServerType()
+  public function getLoginOptions()
   {
-    if (stripos($_SERVER['SERVER_SOFTWARE'], self::SERVER_TYPE_APACHE) !== false) {
-      return self::SERVER_TYPE_APACHE;
-    }
-    else if (stripos($_SERVER['SERVER_SOFTWARE'], self::SERVER_TYPE_IIS) !== false) {
-      return self::SERVER_TYPE_IIS;
-    }
-    else return self::SERVER_TYPE_OTHER;
+    return $this->loginOptions;
   }
   /**
-   * Return the base URL, protocol and hostname, up to but not including the REQUEST_URI
+   * Return the currently configured logout options
    * 
-   * @access private
-   * @return string
+   * @access public
+   * @return array
    */
-  private function getBaseURL() {
-    return 'https://' . $_SERVER['HTTP_HOST'];
+  public function getLogoutOptions()
+  {
+    return $this->logoutOptions;
   }
-
   /**
    * Set the path of the handlerURL (default /Shibboleth.sso) and return it
    * 
@@ -417,14 +424,53 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     return $this->handlerURL;
   }
   /**
+   * Handle HTTP redirection
+   * 
+   * @param string $url
+   * @access protected
+   * @return void
+   */
+  protected function redirect($url)
+  {
+    header("Location: $url");
+    exit();
+  }
+  /**
+   * Returns the server type (iis, apache)
+   * 
+   * @access protected
+   * @return string
+   */
+  protected function getServerType()
+  {
+    if (stripos($_SERVER['SERVER_SOFTWARE'], self::SERVER_TYPE_APACHE) !== false) {
+      return self::SERVER_TYPE_APACHE;
+    }
+    else if (stripos($_SERVER['SERVER_SOFTWARE'], self::SERVER_TYPE_IIS) !== false) {
+      return self::SERVER_TYPE_IIS;
+    }
+    else return self::SERVER_TYPE_OTHER;
+  }
+  /**
+   * Return the base URL, protocol and hostname, up to but not including the REQUEST_URI
+   * 
+   * @access protected
+   * @return string
+   */
+  protected function getBaseURL()
+  {
+    return 'https://' . $_SERVER['HTTP_HOST'];
+  }
+  /**
    * Return a string representing the HTTP header corresponding to the input $shibProperty
    * This means replacing hyphens with underscores and prepending HTTP_
    * 
    * @param mixed $shibProperty 
-   * @access private
+   * @access protected
    * @return bool
    */
-  private static function convertToHTTPHeaderName($shibProperty) {
+  protected static function convertToHTTPHeaderName($shibProperty)
+  {
     return 'HTTP_' . strtoupper(str_replace('-', '_', $shibProperty));
   }
 }

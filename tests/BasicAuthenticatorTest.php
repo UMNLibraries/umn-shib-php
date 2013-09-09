@@ -23,9 +23,42 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
       'Shib-Authentication-Instant' => date('c', time() - 1800),
       'HTTP_SHIB_AUTHENTICATION_INSTANT' => date('c', time() - 3600), // Earlier login in the header (for test distinction)
       'Shib-AuthnContext-Class' => BasicAuthenticator::UMN_MKEY_AUTHN_CONTEXT,
+      'REMOTE_USER' => 'user@example.com',
+      'eppn' => 'user@example.com',
+      'uid' => 'user',
+      'multiAttribute' => 'one;two;three'
     );
   }
 
+  public function testConstructorLoginOptions()
+  {
+    $login_options = array(
+      'isPassive' => true,
+      'mkey' => true
+    );
+
+    $shib = new BasicAuthenticator($login_options);
+    // Default login options are empty, so these should be the only ones set
+    $this->assertEquals($login_options, $shib->getLoginOptions());
+  }
+  public function testConstructorLogoutOptions() 
+  {
+    // Input overwrites some defaults and adds an option
+    $input_logout_options = array(
+      'return' => 'http://www.example.com',
+      'logoutFromIdP' => false,
+      'otherOption' => true
+    );
+    // Result should have overwritten defaults plus existing defaults, and added option
+    $expected_logout_options = array(
+      'return' => 'http://www.example.com',
+      'logoutFromIdP' => false,
+      'IdPLogoutURL' => BasicAuthenticator::UMN_IDP_ENTITY_ID,
+      'otherOption' => true
+    );
+    $shib = new BasicAuthenticator(null, $input_logout_options);
+    $this->assertEquals($expected_logout_options, $shib->getLogoutOptions());
+  }
   public function testLoginURL()
   {
     $shib = new BasicAuthenticator();
@@ -129,6 +162,32 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
     // Test for no session
     unset($_SERVER['HTTP_SHIB_IDENTITY_PROVIDER']);
     $this->assertFalse($shib->hasSession());
+  }
+
+  public function testGetSingleAttributes()
+  {
+    // Single string attribute
+    $shib = new BasicAuthenticator();
+    $this->assertEquals('user@example.com', $shib->getAttributeValue('eppn'));
+
+    // Delimited attribute returns the full string
+    $this->assertEquals('one;two;three', $shib->getAttributeValue('multiAttribute'));
+
+    // Non-existent, null
+    $this->assertNull($shib->getAttributeValues('notexist'));
+  }
+
+  public function testMultiAttributes()
+  {
+    $shib = new BasicAuthenticator();
+    // Known multi attribute returns an array
+    $this->assertEquals(array('one','two','three'), $shib->getAttributeValues('multiAttribute'));
+  
+    // Single value, non-delimited returns an array with one value
+    $this->assertEquals(array('user'), $shib->getAttributeValues('uid'));
+
+    // Non-existent, null
+    $this->assertNull($shib->getAttributeValues('notexist'));
   }
 }
 ?>
