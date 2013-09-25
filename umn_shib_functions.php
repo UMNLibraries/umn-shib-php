@@ -3,46 +3,98 @@ namespace UMNShib\BasicAuthenticator;
 
 require_once('BasicAuthenticator.php');
 
+/**
+ * Construct a Session Initiator URL based on options
+ * 
+ * @param array $options Associative array of options will be merged with defaults or options supplied in the constructor
+ * @return string
+ */
 function umnshib_buildLoginURL(array $options = array())
 {
-  $shib = new BasicAuthenticator();
-  return $shib->buildLoginURL($options);
+  return (new BasicAuthenticator())->buildLoginURL($options);
 }
+/**
+ * Construct a logout URL based on options
+ * 
+ * @param array $options Associative array of options will be merged with defaults or options supplied in the constructor
+ * @return string
+ */
 function umnshib_buildLogoutURL(array $options = array())
 {
-  $shib = new BasicAuthenticator();
-  return $shib->buildLogoutURL($options);
+  return (new BasicAuthenticator())->buildLogoutURL($options);
 }
+/**
+ * Redirect to a login URL
+ * 
+ * @param array $options 
+ * @return void
+ */
 function umnshib_redirectToLogin(array $options = array())
 {
-  $shib = new BasicAuthenticator();
-  $shib->redirectToLogin($options);
+  (new BasicAuthenticator())->redirectToLogin($options);
 }
+/**
+ * Redirect to a logout URL
+ * 
+ * @param array $options 
+ * @return void
+ */
 function umnshib_redirectToLogout(array $options = array())
 {
-  $shib = new BasicAuthenticator();
-  $shib->redirectToLogout($options);
+  (new BasicAuthenticator())->redirectToLogout($options);
 }
+/**
+ * Returns true if the Shib-Identity-Provider is non-empty and one of our 3 expected values
+ * 
+ * @param bool $use_headers Retrieve attributes from HTTP_ headers, default false
+ * @return bool
+ */
 function umnshib_hasSession($use_headers = false)
 {
   $shib = _umnshib_get_object($use_headers);
   return $shib->hasSession();
 }
+/**
+ * Does a valid session exist with the SP?
+ * Returns true if the elapsed time since authentication is greater than maxAge
+ * 
+ * @param integer $maxAge Maximum session lifetime in minutes, default 180 (3 hours)
+ * @param bool $use_headers Retrieve attributes from HTTP_ headers, default false
+ * @return bool
+ */
 function umnshib_hasSessionTimedOut($maxAge = BasicAuthenticator::UMN_SESSION_MAX_AGE, $use_headers = false)
 {
   $shib = _umnshib_get_object($use_headers);
   return $shib->hasSessionTimedOut($maxAge);
 }
+/**
+ * Returns the Shib-Authentication-Instant as a Unix timestamp
+ * 
+ * @param bool $use_headers Retrieve attributes from HTTP_ headers, default false
+ * @return integer
+ */
 function umnshib_loggedInSince($use_headers = false)
 {
   $shib = _umnshib_get_object($use_headers);
   return $shib->loggedInSince();
 }
+/**
+ * Returns the Shib-Identity-Provider if non-empty
+ * 
+ * @param bool $use_headers Retrieve attributes from HTTP_ headers, default false
+ * @return string
+ */
 function umnshib_getIdPEntityId($use_headers = false)
 {
   $shib = _umnshib_get_object($use_headers);
   return $shib->getIdPEntityId();
 }
+/**
+ * Returns true if the user was logged in with an MKey
+ * 
+ * @param bool $use_headers Retrieve attributes from HTTP_ headers, default false
+ * @return bool
+ */
 function umnshib_loggedInWithMKey($use_headers = false)
 {
   $shib = _umnshib_get_object($use_headers);
@@ -53,17 +105,57 @@ function umnshib_getAttributesOrRequestLogin(array $options = array(), $use_head
   $shib = _umnshib_get_object($use_headers);
   return $shib->getAttributesOrRequestLogin($options);
 }
+/**
+ * Return the array of default attribute names
+ * 
+ * @return array
+ */
+function umnshib_getDefaultAttributeNames()
+{
+  return (new BasicAuthenticator())->getDefaultAttributeNames();
+}
+/**
+ * getAttributeNames
+ * 
+ * @param array $requestedAttributes 
+ * @return array
+ */
+function umnshib_getAttributeNames(array $requestedAttributes = array())
+{
+  return (new BasicAuthenticator())->getAttributeNames($requestedAttributes);
+}
+/**
+ * Return an attribute value
+ * 
+ * @param string $name 
+ * @param bool $use_headers Retrieve attributes from HTTP_ headers, default false
+ * @return string
+ */
 function umnshib_getAttributeValue($name, $use_headers = false)
 {
   $shib = _umnshib_get_object($use_headers);
   return $shib->getAttributeValue($name);
 }
-function umnshib_getAttributeValues($name, $use_headers = false)
+/**
+ * Return an array of values from a delimited, multi-value attribute
+ * 
+ * @param string $name 
+ * @param string $delimiter
+ * @param bool $use_headers Retrieve attributes from HTTP_ headers, default false
+ * @return array
+ */
+function umnshib_getAttributeValues($name, $delimiter = ';', $use_headers = false)
 {
   $shib = _umnshib_get_object($use_headers);
   return $shib->getAttributeValues($name);
 }
 
+/**
+ * Return a BasicAuthenticator object and set its attribute access method
+ *
+ * @param bool $use_headers Retrive attributes from HTTP_ headers, default false
+ * @return BasicAuthenticator
+ */
 function _umnshib_get_object($use_headers = false)
 {
   $shib = new BasicAuthenticator();
