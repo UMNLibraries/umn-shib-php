@@ -1,3 +1,3 @@
 <?php
-define('APPDIR', __DIR__ . '/..');
+if (!defined('APPDIR')) define('APPDIR', __DIR__ . '/..');
 ?>

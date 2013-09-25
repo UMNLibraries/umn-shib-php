@@ -32,7 +32,6 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
       'HTTP_MULTIATTRIBUTE' => 'one;two;three'
     );
   }
-
   public function testConstructorLoginOptions()
   {
     $login_options = array(

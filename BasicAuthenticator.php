@@ -362,16 +362,17 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   /**
    * Return an array of values from a delimited, multi-value attribute
    * 
-   * @param mixed $name 
+   * @param string $name 
+   * @param string $delimiter
    * @access public
    * @return array
    */
-  public function getAttributeValues($name) {
+  public function getAttributeValues($name, $delimiter = ';') {
     $value = null;
     if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_HEADERS) {
       $name = self::convertToHTTPHeaderName($name);
     }
-    if (!empty($_SERVER[$name])) $value = explode(';', $_SERVER[$name]);
+    if (!empty($_SERVER[$name])) $value = explode($delimiter, $_SERVER[$name]);
     return $value;
   }
   /**
