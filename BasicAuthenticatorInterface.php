@@ -2,6 +2,14 @@
 
 namespace UMNShib\BasicAuthenticator;
 
+/**
+ * BasicAuthenticatorInterface
+ * 
+ * @package UMNShib\BasicAuthenticator
+ * @copyright [Copyright]
+ * @author Michael Berkowski <mjb@umn.edu> 
+ * @license [License]
+ */
 Interface BasicAuthenticatorInterface
 {
   public function buildLoginURL(array $options = array());

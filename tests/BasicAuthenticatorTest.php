@@ -25,8 +25,11 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
       'Shib-AuthnContext-Class' => BasicAuthenticator::UMN_MKEY_AUTHN_CONTEXT,
       'REMOTE_USER' => 'user@example.com',
       'eppn' => 'user@example.com',
+      'HTTP_EPPN' => 'user@example.com',
       'uid' => 'user',
-      'multiAttribute' => 'one;two;three'
+      'HTTP_UID' => 'user',
+      'multiAttribute' => 'one;two;three',
+      'HTTP_MULTIATTRIBUTE' => 'one;two;three'
     );
   }
 
@@ -151,7 +154,10 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
     // Check an expired session passing $maxAge = 1
     $this->assertTrue($shib->hasSessionTimedOut(1));
 
-    // Repeat these after setting for header access instead of Env access
+  }
+
+  public function testSessionStateFromHeaders() {
+    $shib = new BasicAuthenticator();
     $shib->setAttributeAccessMethod(BasicAuthenticator::UMN_ATTRS_FROM_HEADERS);
 
     $idp = $_SERVER['HTTP_SHIB_IDENTITY_PROVIDER'];
@@ -177,9 +183,38 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
     $this->assertNull($shib->getAttributeValues('notexist'));
   }
 
+  public function testGetSingleAttributesFromHeaders()
+  {
+    // Single string attribute
+    $shib = new BasicAuthenticator();
+    $shib->setAttributeAccessMethod(BasicAuthenticator::UMN_ATTRS_FROM_HEADERS);
+    $this->assertEquals('user@example.com', $shib->getAttributeValue('eppn'));
+
+    // Delimited attribute returns the full string
+    $this->assertEquals('one;two;three', $shib->getAttributeValue('multiAttribute'));
+
+    // Non-existent, null
+    $this->assertNull($shib->getAttributeValues('notexist'));
+  }
+
   public function testMultiAttributes()
   {
     $shib = new BasicAuthenticator();
+    // Known multi attribute returns an array
+    $this->assertEquals(array('one','two','three'), $shib->getAttributeValues('multiAttribute'));
+  
+    // Single value, non-delimited returns an array with one value
+    $this->assertEquals(array('user'), $shib->getAttributeValues('uid'));
+
+    // Non-existent, null
+    $this->assertNull($shib->getAttributeValues('notexist'));
+  }
+
+  public function testMultiAttributesFromHeaders()
+  {
+    $shib = new BasicAuthenticator();
+    $shib->setAttributeAccessMethod(BasicAuthenticator::UMN_ATTRS_FROM_HEADERS);
+
     // Known multi attribute returns an array
     $this->assertEquals(array('one','two','three'), $shib->getAttributeValues('multiAttribute'));
   

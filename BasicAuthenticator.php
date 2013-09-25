@@ -3,7 +3,17 @@
 namespace UMNShib\BasicAuthenticator;
 
 require_once('BasicAuthenticatorInterface.php');
+require_once('umn_shib_functions.php');
 
+/**
+ * BasicAuthenticator API implementation for UMN Shibboleth
+ * 
+ * @uses BasicAuthenticatorInterface
+ * @package UMNShib\BasicAuthenticator
+ * @copyright [Copyright]
+ * @author Michael Berkowski <mjb@umn.edu> 
+ * @license [License]
+ */
 class BasicAuthenticator implements BasicAuthenticatorInterface
 {
   // API Constants
@@ -256,7 +266,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    * @access public
    * @return array
    */
-  public function getAttributesOrRequestLogin(array $options)
+  public function getAttributesOrRequestLogin(array $options = array())
   {
     if ($this->hasSessionTimedOut($this->maxAge)) {
       $this->redirectToLogin($options);
