@@ -1,6 +1,6 @@
 <?php
 
-namespace UMNShib\BasicAuthenticator;
+namespace UMNShib;
 
 require_once('BasicAuthenticatorInterface.php');
 require_once('umn_shib_functions.php');
