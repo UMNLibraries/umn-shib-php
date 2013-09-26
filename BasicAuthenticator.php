@@ -284,10 +284,10 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   public function loggedInWithMKey() {
     if ($this->hasSession()) {
       if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_ENV) {
-        return $_SERVER['Shib-AuthnContext-Class'] == self::UMN_MKEY_AUTHN_CONTEXT;
+        return $_SERVER['Shib-Authentication-Method'] == self::UMN_MKEY_AUTHN_CONTEXT;
       }
       else {
-        return $_SERVER['HTTP_SHIB_AUTHNCONTEXT_CLASS'] == self::UMN_MKEY_AUTHN_CONTEXT;
+        return $_SERVER['HTTP_SHIB_AUTHENTICATION_METHOD'] == self::UMN_MKEY_AUTHN_CONTEXT;
       }
     }
     return false;

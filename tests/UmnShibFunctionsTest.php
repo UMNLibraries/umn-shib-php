@@ -22,6 +22,7 @@ class UmnShibFunctionsTest extends \PHPUnit_Framework_TestCase
       'Shib-Authentication-Instant' => date('c', time() - 1800),
       'HTTP_SHIB_AUTHENTICATION_INSTANT' => date('c', time() - 3600), // Earlier login in the header (for test distinction)
       'Shib-AuthnContext-Class' => BasicAuthenticator::UMN_MKEY_AUTHN_CONTEXT,
+      'Shib-Authentication-Method' => BasicAuthenticator::UMN_MKEY_AUTHN_CONTEXT,
       'REMOTE_USER' => 'user@example.com',
       'eppn' => 'user@example.com',
       'HTTP_EPPN' => 'user@example.com',
