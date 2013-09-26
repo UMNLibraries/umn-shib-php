@@ -1,6 +1,6 @@
 <?php
 
-namespace UMNShib;
+namespace UMNShib\Basic;
 
 require_once(APPDIR . '/BasicAuthenticator.php');
 

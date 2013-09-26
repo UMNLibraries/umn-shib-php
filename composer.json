@@ -13,8 +13,8 @@
     },
     "autoload": {
         "psr-0": {
-            "UMNShib\\": ""
+            "UMNShib\\Basic\\": ""
         }
     },
-    "target-dir": "UMNShib/BasicAuthenticator"
+    "target-dir": "UMNShib/Basic"
 }
