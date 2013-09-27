@@ -196,10 +196,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    * @return string
    */
   public function getIdPEntityId() {
-    $name = 'Shib-Identity-Provider';
-    if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_HEADERS) {
-      $name = self::convertToHTTPHeaderName($name);
-    }
+    $name = $this->normalizeAttributeName('Shib-Identity-Provider');
     return !empty($_SERVER[$name]) ? $_SERVER[$name] : null;
   }
   /**
@@ -248,15 +245,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    * @return integer
    */
   public function loggedInSince() {
-    if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_ENV) {
-      $auth_instant = !empty($_SERVER['Shib-Authentication-Instant']) ? $_SERVER['Shib-Authentication-Instant'] : null;
-    }
-    else if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_HEADERS) {
-      $auth_instant = !empty($_SERVER['HTTP_SHIB_AUTHENTICATION_INSTANT']) ? $_SERVER['HTTP_SHIB_AUTHENTICATION_INSTANT'] : null;
-    }
-    // No authentication instant, no session, return true
-    else $auth_instant = null;
-
+    $auth_instant = $this->getAttributeValue('Shib-Authentication-Instant');
     return strtotime($auth_instant);
   }
   /**
@@ -283,12 +272,8 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    */
   public function loggedInWithMKey() {
     if ($this->hasSession()) {
-      if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_ENV) {
-        return $_SERVER['Shib-Authentication-Method'] == self::UMN_MKEY_AUTHN_CONTEXT;
-      }
-      else {
-        return $_SERVER['HTTP_SHIB_AUTHENTICATION_METHOD'] == self::UMN_MKEY_AUTHN_CONTEXT;
-      }
+      $auth_method = $this->getAttributeValue('Shib-Authentication-Method');
+      return $auth_method == self::UMN_MKEY_AUTHN_CONTEXT;
     }
     return false;
   }
@@ -354,9 +339,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    */
   public function getAttributeValue($name) {
     $value = null;
-    if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_HEADERS) {
-      $name = self::convertToHTTPHeaderName($name);
-    }
+    $name = $this->normalizeAttributeName($name);
     return !empty($_SERVER[$name]) ? $_SERVER[$name] : null;
   }
   /**
@@ -369,9 +352,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    */
   public function getAttributeValues($name, $delimiter = ';') {
     $value = null;
-    if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_HEADERS) {
-      $name = self::convertToHTTPHeaderName($name);
-    }
+    $name = $this->normalizeAttributeName($name);
     if (!empty($_SERVER[$name])) $value = explode($delimiter, $_SERVER[$name]);
     return $value;
   }
@@ -385,9 +366,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   public function getAttributes($requestedAttributes = array()) {
     $attrs = array_flip(array_merge($this->attributes, $requestedAttributes));
     foreach ($attrs as $key => $value) {
-      if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_HEADERS) {
-        $key = self::convertToHTTPHeaderName($key);
-      }
+      $key = $this->normalizeAttributeName($key);
       $attrs[$key] = isset($_SERVER[$key]) ? $_SERVER[$key] : null;
     }
     return $attrs;
@@ -471,6 +450,20 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   protected function getBaseURL()
   {
     return 'https://' . $_SERVER['HTTP_HOST'];
+  }
+  /**
+   * Return the bare attribute name or HTTP_ header version according to $attributeSource
+   * 
+   * @param string $name Shibboleth attribute name
+   * @access protected
+   * @return string
+   */
+  protected function normalizeAttributeName($name)
+  {
+    if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_HEADERS) {
+      $name = self::convertToHTTPHeaderName($name);
+    }
+    return $name;
   }
   /**
    * Return a string representing the HTTP header corresponding to the input $shibProperty
