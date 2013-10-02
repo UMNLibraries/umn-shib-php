@@ -327,7 +327,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    * @access public
    * @return array
    */
-  public function getAttributeNames($requestedAttributes = array()) {
+  public function getAttributeNames(array $requestedAttributes = array()) {
     return array_merge($this->attributes, $requestedAttributes);
   }
   /**
@@ -363,7 +363,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    * @access public
    * @return array
    */
-  public function getAttributes($requestedAttributes = array()) {
+  public function getAttributes(array $requestedAttributes = array()) {
     $attrs = array_flip(array_merge($this->attributes, $requestedAttributes));
     foreach ($attrs as $key => $value) {
       $key = $this->normalizeAttributeName($key);
