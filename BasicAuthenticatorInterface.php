@@ -26,8 +26,8 @@ Interface BasicAuthenticatorInterface
 
   public function getAttributeAccessMethod();
   public function getDefaultAttributeNames();
-  public function getAttributeNames($requestedAttributes);
+  public function getAttributeNames(array $requestedAttributes);
   public function getAttributeValue($name);
   public function getAttributeValues($name);
-  public function getAttributes($requestedAttributes);
+  public function getAttributes(array $requestedAttributes);
 }
