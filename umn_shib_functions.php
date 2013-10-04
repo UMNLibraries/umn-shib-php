@@ -1,5 +1,20 @@
 <?php
+
 namespace UMNShib\Basic;
+
+/**
+ * Procedural interface to BasicAuthenticator API implementation for UMN Shibboleth
+ * Allows single function calls to perform basic Shibboleth actions like URL generation
+ * redirection to login/logout, etc.  These function calls maintain no state!
+ * Every call is an independent, one-off action instantiating its own new BasicAuthenticator
+ * object and discarding it when it is completed.
+ * 
+ * @uses BasicAuthenticator
+ * @package UMNShib\BasicAuthenticator
+ * @copyright [Copyright]
+ * @author Michael Berkowski <mjb@umn.edu> 
+ * @license [License]
+ */
 
 require_once('BasicAuthenticator.php');
 
@@ -165,3 +180,6 @@ function _umnshib_get_object($use_headers = false)
   return $shib;
 }
 ?>
+/**
+ *  
+ */
