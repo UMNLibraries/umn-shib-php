@@ -123,11 +123,6 @@ function umnshib_loggedInWithMKey($use_headers = false)
   $shib = _umnshib_get_object($use_headers);
   return $shib->loggedInWithMKey();
 }
-function umnshib_getAttributesOrRequestLogin(array $options = array(), $use_headers = false)
-{
-  $shib = _umnshib_get_object($use_headers);
-  return $shib->getAttributesOrRequestLogin($options);
-}
 /**
  * Return the array of default attribute names
  * 
