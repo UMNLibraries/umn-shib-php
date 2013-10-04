@@ -8,6 +8,9 @@ namespace UMNShib\Basic;
  * redirection to login/logout, etc.  These function calls maintain no state!
  * Every call is an independent, one-off action instantiating its own new BasicAuthenticator
  * object and discarding it when it is completed.
+ *
+ * Example to enforce a passive login with one function call:
+ *   $user_attributes = umnshib_getAttributesOrRequestLogin(array('isPassive' => true));
  * 
  * @uses BasicAuthenticator
  * @package UMNShib\BasicAuthenticator
@@ -92,6 +95,11 @@ function umnshib_loggedInSince($use_headers = false)
 {
   $shib = _umnshib_get_object($use_headers);
   return $shib->loggedInSince();
+}
+function umnshib_getAttributesOrRequestLogin(array $options = array(), $use_headers = false)
+{
+  $shib = _umnshib_get_object($use_headers);
+  return $shib->getAttributesOrRequestLogin($options);
 }
 /**
  * Returns the Shib-Identity-Provider if non-empty
@@ -180,6 +188,3 @@ function _umnshib_get_object($use_headers = false)
   return $shib;
 }
 ?>
-/**
- *  
- */
