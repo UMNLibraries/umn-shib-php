@@ -29,7 +29,8 @@ require_once('BasicAuthenticator.php');
  */
 function umnshib_buildLoginURL(array $options = array())
 {
-  return (new BasicAuthenticator())->buildLoginURL($options);
+  $shib = new BasicAuthenticator();
+  return $shib->buildLoginURL($options);
 }
 /**
  * Construct a logout URL based on options
@@ -39,7 +40,8 @@ function umnshib_buildLoginURL(array $options = array())
  */
 function umnshib_buildLogoutURL(array $options = array())
 {
-  return (new BasicAuthenticator())->buildLogoutURL($options);
+  $shib = new BasicAuthenticator();
+  return $shib->buildLogoutURL($options);
 }
 /**
  * Redirect to a login URL
@@ -49,7 +51,8 @@ function umnshib_buildLogoutURL(array $options = array())
  */
 function umnshib_redirectToLogin(array $options = array())
 {
-  (new BasicAuthenticator())->redirectToLogin($options);
+  $shib = new BasicAuthenticator();
+  $shib->redirectToLogin($options);
 }
 /**
  * Redirect to a logout URL
@@ -59,7 +62,8 @@ function umnshib_redirectToLogin(array $options = array())
  */
 function umnshib_redirectToLogout(array $options = array())
 {
-  (new BasicAuthenticator())->redirectToLogout($options);
+  $shib = new BasicAuthenticator();
+  $shib->redirectToLogout($options);
 }
 /**
  * Returns true if the Shib-Identity-Provider is non-empty and one of our 3 expected values
@@ -130,7 +134,8 @@ function umnshib_loggedInWithMKey($use_headers = false)
  */
 function umnshib_getDefaultAttributeNames()
 {
-  return (new BasicAuthenticator())->getDefaultAttributeNames();
+  $shib = new BasicAuthenticator();
+  return $shib->getDefaultAttributeNames();
 }
 /**
  * getAttributeNames
@@ -140,7 +145,8 @@ function umnshib_getDefaultAttributeNames()
  */
 function umnshib_getAttributeNames(array $requestedAttributes = array())
 {
-  return (new BasicAuthenticator())->getAttributeNames($requestedAttributes);
+  $shib = new BasicAuthenticator();
+  return $shib->getAttributeNames($requestedAttributes);
 }
 /**
  * Return an attribute value
