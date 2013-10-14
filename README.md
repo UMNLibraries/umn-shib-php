@@ -30,31 +30,35 @@ procedural interface.
 Internally, the procedural interface merely wraps the object-oriented one, and
 must discard some functionality where it is unable to maintain state.
 
-    use \UMNShib\Basic;
+```php
+use \UMNShib\Basic;
 
-    // Example Object-Oriented instantiation and redirect to login:
-    $umnshib = new BasicAuthenticator();
-    if (!$umnshib->hasSession()) {
-      $umnshib->redirectToLogin($loginOptions);
-    }
+// Example Object-Oriented instantiation and redirect to login:
+$umnshib = new BasicAuthenticator();
+if (!$umnshib->hasSession()) {
+  $umnshib->redirectToLogin($loginOptions);
+}
 
-    // Comparable example using the procedural interface
-    if (!umnshib_hasSession()) {
-      umnshib_redirectToLogin();
-    }
+// Comparable example using the procedural interface
+if (!umnshib_hasSession()) {
+  umnshib_redirectToLogin();
+}
+```
 
 The examples in the previous section demonstrate usage when you may have some custom logic to perform. It
 is also possible to make a single call to either retrieve all known attributes
 as an array or redirect to a login session:
 
-    use \UMNShib\Basic;
+```php
+use \UMNShib\Basic;
 
-    // Object-oriented style
-    $umnshib = new BasicAuthenticator();
-    $attributes = $umnshib->getAttributesOrRedirectToLogin();
+// Object-oriented style
+$umnshib = new BasicAuthenticator();
+$attributes = $umnshib->getAttributesOrRedirectToLogin();
 
-    // Procedural style
-    $attributes = umnshib_getAttributesOrRedirectToLogin();
+// Procedural style
+$attributes = umnshib_getAttributesOrRedirectToLogin();
+```
 
 ## Configuration
 ### Shibboleth.sso handler URL
@@ -62,22 +66,28 @@ Most commonly (by default), the Shibboleth SP handler URL is located at
 `/Shibboleth.sso` and this library expects to find it there unless otherwise
 instructed.
 
-    $umnshib->setHandlerURL('/some/other/path/Shibboleth.sso');
+```php
+$umnshib->setHandlerURL('/some/other/path/Shibboleth.sso');
+```
 
 ### Shibboleth environment or HTTP headers
 If your server is configured to with `ShibUseHeaders on`, you will need to set
 it up accordingly via `setAttributeAccessMethod()`. By default it will retrieve
 attributes from the web server environment rather than HTTP headers.
 
-    // Object-oriented setup
-    $umnshib->setAttributeAccessMethod(\UMNShib\Basic\BasicAuthenticator::UMN_ATTRS_FROM_HEADERS);
+```php
+// Object-oriented setup
+$umnshib->setAttributeAccessMethod(\UMNShib\Basic\BasicAuthenticator::UMN_ATTRS_FROM_HEADERS);
+```
 
 When using the procedural interface, functions requiring access to Shibboleth
 attributes include a `$useHeaders` boolean parameter, which defaults to `false`.
 
-    // Procedural example retrieving attributes from HTTP headers,
-    // pass true as the $useHeaders parameter0
-    $uid = umnshib_getAttributeValue('uid', true);
+```php
+// Procedural example retrieving attributes from HTTP headers,
+// pass true as the $useHeaders parameter0
+$uid = umnshib_getAttributeValue('uid', true);
+```
 
 ### Login / Logout Options
 Several options are available to facilitate features like passive
@@ -104,20 +114,25 @@ Available options:
 Retrieve a login URL forcing a login screen even if the user already has a
 session, using 2-factor (MKey):
 
-    $url = buildLoginURL(array('forceAuthn' => true, 'mkey' => true));
+```php
+$url = buildLoginURL(array('forceAuthn' => true, 'mkey' => true));
+```
 
 Redirect through the login passively (no login screen) and specify the return
 URL:
 
-    redirectToLogin(array(
-      'passive' => true,
-      'target' => 'https://example.com/passive/login/endpoint'
-    ));
+```php
+redirectToLogin(array(
+  'passive' => true,
+  'target' => 'https://example.com/passive/login/endpoint'
+));
+```
 
 Login using the test IdP:
 
-    $url = buildLoginURL(array('IdPEntityID' => BasicAuthenticator::UMN_TEST_IDP_ENTITY_ID));
-
+```php
+$url = buildLoginURL(array('IdPEntityID' => BasicAuthenticator::UMN_TEST_IDP_ENTITY_ID));
+```
 #### Logout Options
 - `return` Return URL
 - `logoutFromIdP` Complete a logout from the IdP
@@ -126,21 +141,24 @@ Login using the test IdP:
 ##### Examples
 Logout from the IdP, and specify the return URL:
 
-    buildLogoutURL(array(
-      'logoutFromIdP' => true,
-      'return' => 'https://example.com/logout/endpoint'
-    ));
+```php
+buildLogoutURL(array(
+  'logoutFromIdP' => true,
+  'return' => 'https://example.com/logout/endpoint'
+));
+```
 
 #### Passing options to the constructor on instantiation
 Login options may also be passed to the constructor:
 
-    // Options in the constructor
-    $umnshib = new BasicAuthenticator(
-      // First param is array of login options
-      array('forceAuthn' => true, 'target' => 'https://example.com/login/target'),
-      // Second param is array of logout options
-      array('logoutFromIdP' => true)
-    );
-    // And they are applied when building URLs...
-    $url = $umnshib->buildLoginURL();
-
+```php
+// Options in the constructor
+$umnshib = new BasicAuthenticator(
+  // First param is array of login options
+  array('forceAuthn' => true, 'target' => 'https://example.com/login/target'),
+  // Second param is array of logout options
+  array('logoutFromIdP' => true)
+);
+// And they are applied when building URLs...
+$url = $umnshib->buildLoginURL();
+```
