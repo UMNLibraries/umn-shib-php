@@ -252,16 +252,18 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    * Returns the current session's attributes or forces a login redirect if no session is present
    * 
    * @param array $options Array of login options, see buildLoginURL()
+   * @param array $requestedAttributes 
    * @access public
    * @return array
    */
-  public function getAttributesOrRequestLogin(array $options = array())
+  public function getAttributesOrRequestLogin(array $options = array(), array $requestedAttributes = array())
   {
     if ($this->hasSessionTimedOut($this->maxAge)) {
       $this->redirectToLogin($options);
     }
     else {
-      return $this->getAttributes();
+      // Login is good, return attributes passing in requested set or default if not specified
+      return $this->getAttributes($requestedAttributes);
     }
   }
   /**
