@@ -259,7 +259,9 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    */
   public function getAttributesOrRequestLogin(array $options = array(), array $requestedAttributes = array(), $maxAge = self::UMN_SESSION_MAX_AGE)
   {
+    // Timed out, force login
     if ($this->hasSessionTimedOut($maxAge)) {
+      $options['forceAuthn'] = true;
       $this->redirectToLogin($options);
     }
     else {
