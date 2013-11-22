@@ -220,7 +220,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    * Does a valid session exist with the SP?
    * Returns true if the elapsed time since authentication is greater than maxAge
    * 
-   * @param integer $maxAge Maximum session lifetime in minutes, default 180 (3 hours)
+   * @param integer $maxAge Maximum session lifetime in seconds, default UMN_SESSION_MAX_AGE
    * @access public
    * @return bool
    */
@@ -253,12 +253,13 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    * 
    * @param array $options Array of login options, see buildLoginURL()
    * @param array $requestedAttributes 
+   * @param integer $maxAge Maximum session lifetime in seconds, default UMN_SESSION_MAX_AGE
    * @access public
    * @return array
    */
-  public function getAttributesOrRequestLogin(array $options = array(), array $requestedAttributes = array())
+  public function getAttributesOrRequestLogin(array $options = array(), array $requestedAttributes = array(), $maxAge = self::UMN_SESSION_MAX_AGE)
   {
-    if ($this->hasSessionTimedOut($this->maxAge)) {
+    if ($this->hasSessionTimedOut($maxAge)) {
       $this->redirectToLogin($options);
     }
     else {
