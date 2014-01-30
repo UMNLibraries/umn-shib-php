@@ -108,6 +108,9 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
 
     $params = array();
     // Parse explicit and implicit options, build the query string
+    // Default to the current URI if no target was supplied
+    $params['target'] = !empty($options['target']) ? $options['target'] : $loginBase . $_SERVER['REQUEST_URI'];
+
     if (isset($options['entityID'])) {
       $params['entityID'] = $options['entityID'];
     }
@@ -123,9 +126,6 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     if (isset($options['authnContextClassRef']) && !empty($options['authnContextClassRef'])) {
       $params['authnContextClassRef'] = $options['authnContextClassRef'];
     }
-    // Default to the current URI if no target was supplied
-    $params['target'] = !empty($options['target']) ? $options['target'] : $loginBase . $_SERVER['REQUEST_URI'];
-
     $query = http_build_query($params);
 
     $loginURL = $loginBase . $this->handlerURL . '/Login';
