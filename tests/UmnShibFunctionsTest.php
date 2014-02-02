@@ -14,7 +14,7 @@ class UmnShibFunctionsTest extends \PHPUnit_Framework_TestCase
   public function setUp()
   {
     // Initialize _SERVER superglobal since this is a CLI run
-    $_SERVER = array(
+    $shib_server = array(
       'HTTP_HOST' => $this->http_host,
       'REQUEST_URI' => $this->request_uri,
       'Shib-Identity-Provider' => BasicAuthenticator::UMN_IDP_ENTITY_ID,
@@ -31,6 +31,10 @@ class UmnShibFunctionsTest extends \PHPUnit_Framework_TestCase
       'multiAttribute' => 'one;two;three',
       'HTTP_MULTIATTRIBUTE' => 'one;two;three'
     );
+    $GLOBALS['_SERVER'] = array_merge($GLOBALS['_SERVER'], $shib_server);
+    
+    // Enforce correct arg separator in case prior test removes it
+    ini_set('arg_separator.output', '&');
   }
 
   public function testLoginURL()
