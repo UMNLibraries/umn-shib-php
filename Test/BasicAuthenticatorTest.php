@@ -1,8 +1,8 @@
 <?php
 
-namespace UMNShib\Basic;
+namespace UMNShib\Basic\Test;
 
-require_once(APPDIR . '/BasicAuthenticator.php');
+use UMNShib\Basic\BasicAuthenticator;
 
 class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
 {
