@@ -1,5 +1,6 @@
 <?php
 
+
 namespace UMNShib\Basic;
 
 require_once('BasicAuthenticatorInterface.php');
