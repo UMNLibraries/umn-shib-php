@@ -83,9 +83,41 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     'isGuest',
     'umnDID'
   );
+  /**
+   * Set to true if a mock user was established
+   * 
+   * @var bool
+   * @access protected
+   */
+  protected $isMockUser = false;
   
   public function __construct($loginOptions = array(), $logoutOptions = array())
   {
+    // Probe for a mock-allowed environment and load the user
+    if (getenv('UMNSHIB_ALLOW_MOCK_USER') != false) {
+      $mock = new Mock\UserFactory(getenv('UMNSHIB_MOCK_USER_FILE'));
+      // $_GET is preferred over env
+      if (getenv('UMNSHIB_MOCK_USER') != false) {
+        $mockusername = trim(getenv('UMNSHIB_MOCK_USER'));
+      }
+      // Overwrites env if set aready
+      if (!empty($_GET['UMNSHIB_MOCK_USER'])) {
+        $mockusername = trim($_GET['UMNSHIB_MOCK_USER']);
+      }
+      if (!empty($mockusername)) {
+        // Don't throw an exception on an invalid user, convert it to E_NOTICE
+        // If in implementation there's no try/catch this won't break things
+        // 
+        // Note: I'm not sure if I like this. Open to suggestions regarding its utility
+        // Maybe an exception is appropriate and this is confusing and inconsistent.
+        try {
+          $mock->setUser($mock->getUser($mockusername));
+        }
+        catch (Mock\Exception\UserNotFoundException $e) {
+          trigger_error($e->getMessage(), E_USER_NOTICE);
+        }
+      }
+    }
     // Login/Logout options may be supplied in the constructor
     if (is_array($loginOptions)) {
       $this->loginOptions = array_merge($this->loginOptions, $loginOptions);
@@ -489,7 +521,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    * @access protected
    * @return bool
    */
-  protected static function convertToHTTPHeaderName($shibProperty)
+  public static function convertToHTTPHeaderName($shibProperty)
   {
     return 'HTTP_' . strtoupper(str_replace('-', '_', $shibProperty));
   }

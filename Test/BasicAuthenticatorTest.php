@@ -1,5 +1,4 @@
 <?php
-
 namespace UMNShib\Basic\Test;
 
 use UMNShib\Basic\BasicAuthenticator;
@@ -35,6 +34,30 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
     $GLOBALS['_SERVER'] = array_merge($GLOBALS['_SERVER'], $shib_server);
 
     ini_set('arg_separator.output', '&');
+  }
+  public function tearDown()
+  {
+    // Get rid of shib-related keys we've set by sting match
+    foreach (array_keys($_SERVER) as $key) {
+      if (strpos($key, 'Shib') !== false || strpos($key, 'HTTP_SHIB') !== false) {
+        unset($_SERVER[$key]);
+      }
+    }
+    // And other keys we set
+    $keys = array( 
+      'HTTP_HOST',
+      'REQUEST_URI',
+      'REMOTE_USER',
+      'eppn',
+      'HTTP_EPPN',
+      'uid',
+      'HTTP_UID',
+      'multiAttribute',
+      'HTTP_MULTIATTRIBUTE'
+    );
+    foreach ($keys as $key) {
+      if (isset($_SERVER[$key])) unset($_SERVER[$key]);
+    }
   }
   public function testConstructorLoginOptions()
   {
@@ -227,7 +250,6 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
     // Non-existent, null
     $this->assertNull($shib->getAttributeValues('notexist'));
   }
-
   /**
    * @expectedException \PHPUnit_Framework_Error_Warning
    */

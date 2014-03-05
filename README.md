@@ -162,3 +162,99 @@ $umnshib = new BasicAuthenticator(
 // And they are applied when building URLs...
 $url = $umnshib->buildLoginURL();
 ```
+
+## Testing and Mock Users
+### Enabling mock users on the server
+Mock users must be enabled in the server environment by the presence and truthy
+value of the environment variable `UMNSHIB_ALLOW_MOCK_USER`.o
+
+**DO NOT enable mock users on any system accessed by untrusted users!**
+
+The variable may be set at runtime with an expression like:
+
+```php
+setenv('UMNSHIB_ALLOW_MOCK_USER', true);
+```
+
+Or ideally it could be set in the server itself, allowing test/production
+environments proper segregation.  To set it with Apache `mod_rewrite`, use:
+
+```apache
+RewriteEngine On
+RewriteRule ^ - [E=UMNSHIB_ALLOW_MOCK_USER:true]
+```
+
+### Defining mock users
+Mock users are defined in a PHP file, also pointed to by an environment
+variable.  _PHP isn't a great option but it has no dependencies and is
+relatively safe from accidental exposure by the web server. Of course, YAML or
+JSON would be nicer, but let's stick with PHP for now..._
+
+```php
+setenv('UMNSHIB_MOCK_USER_FILE', '/path/to/mock_users.php');
+// ... or use Apache mod_rewrite with the same pattern as described earlier...
+```
+
+The mock users definition be a PHP file from which you `return` an `array()` of
+users.  The array must be associative, indexed by username (the `uid`
+attribute value).  It then serves as a `key => value` list of other attributes
+to set in the user's environment.
+
+Note about `REMOTE_USER`: If your application expects the `REMOTE_USER` CGI
+variable to be set to a value like `uid` or `eppn` per your server's Shibboleth
+configuration, you must set `REMOTE_USER` in the mock user array. It won't be
+set automatically.
+
+```php
+<?php
+// Sample mock user file
+// Must return an associative array
+return array(
+  'user1' => array(
+    'uid' => 'user1',
+    'REMOTE_USER' => 'user2@example.com',
+    'eppn' => 'user1@example.com',
+    'givenName' => 'Alice',
+    'surname' => 'Testuser'
+  ),
+  'user2' => array(
+    'uid' => 'user2',
+    'REMOTE_USER' => 'user2@example.com',
+    'eppn' => 'user2@example.com',
+    'givenName' => 'Bob',
+    'surname' => 'Fakeuser'
+  )
+);
+```
+### Selecting mock users at runtime
+Once the server permits the use of mock users, you must request them through the
+query string or an environment variable:
+
+```php
+// Via the query string
+// Does not persist across requests...
+http://example.com/your_shib_script.php?UMNSHIB_MOCK_USER=user1
+
+// Via an environment variable
+setenv('UMNSHIB_MOCK_USER', 'user1');
+// Or via Apache mod_rewrite as above
+```
+
+## Testing
+Tests are executed with PHPUnit.  There are _two_ test configurations, owing to
+a dependency on environment variables for mock users.
+
+### Primary testing
+For basic functionality, `phpunit.xml.dist` has full test coverage. Executing
+`phpunit` in the project directory will run the main tests.
+
+### Testing mock users
+Since enabling and loading mock users depends on environment variables, a
+different PHPUnit configuration is needed to establish the environment at the
+beginning of execution.
+
+To run the tests related to probing and loading mock users, do
+
+    phpunit -c phpunit-mockenv.xml
+
+

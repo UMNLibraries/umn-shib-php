@@ -7,36 +7,37 @@ use UMNShib\Basic\BasicAuthenticator;
 class UserFactory
 {
   protected $users = array();
-  protected $userfile = '';
+  protected $userFile = '';
+  protected $commonAttributes = array();
 
   /**
    * Receives a file path to load Mock Users
    * 
-   * @param string|null $userfile PHP file returning a user array, or the default file if null
+   * @param string|null $userFile PHP file returning a user array, or the default file if null
    * @access public
    * @return bool
    */
-  public function __construct($userfile = null)
+  public function __construct($userFile = null)
   {
-    if (empty($userfile)) {
-      $userfile = __DIR__ . '/Fixtures/MockUsers.php';
+    if (empty($userFile)) {
+      $userFile = __DIR__ . '/Fixtures/MockUsers.php';
     }
-    if (!file_exists($userfile)) {
-      throw new Exception\UserFileNotFoundException("The requested Mock User file $userfile not found");
+    if (!file_exists($userFile)) {
+      throw new Exception\UserFileNotFoundException("The requested Mock User file $userFile not found");
     }
 
-    // $userfile should define and return a 2D array
+    // $userFile should define and return a 2D array
     // indexed by username
-    $users = include($userfile);
+    $users = include($userFile);
     if (!is_array($users)) {
-      throw new \UnexpectedValueException("$userfile must define and return an array");
+      throw new \UnexpectedValueException("$userFile must define and return an array");
     }
     if (!$this->validateUserArray($users)) {
-      throw new \UnexpectedValueException("$userfile array must have contain string keys and sub-arrays");
+      throw new \UnexpectedValueException("$userFile array must have contain string keys and sub-arrays");
     }
 
     $this->users = $users;
-    $this->userfile = realpath($userfile);
+    $this->userFile = realpath($userFile);
     return;
   }
   /**
@@ -44,12 +45,12 @@ class UserFactory
    * 
    * @param string $username
    * @access public
-   * @return UMNShib\Basic\Mock\User
+   * @return array
    */
   public function getUser($username)
   {
     if (array_key_exists($username, $this->users)) {
-      return new User($username);
+      return $this->users[$username];
     }
     else {
       throw new Exception\UserNotFoundException();
@@ -59,11 +60,11 @@ class UserFactory
    * Return a random user from the Mock users list
    * 
    * @access public
-   * @return UMNShib\Basic\Mock\User
+   * @return array
    */
   public function getRandomUser()
   {
-    return new User(array_rand(array_keys($this->users)));
+    return $this->users[array_rand($this->users)];
   }
   /**
    * Return the currently loaded mock user file
@@ -73,11 +74,55 @@ class UserFactory
    */
   public function getUserFile()
   {
-    return $this->userfile;
+    return $this->userFile;
   }
+  /**
+   * Setup a set of attributes related to the session
+   * Any of these may be overridden by array values in the mock user.
+   * 
+   * @access public
+   * @return void
+   */
+  public function setCommonAttributes()
+  {
+    $this->commonAttributes = array(
+      'Shib-Identity-Provider' => BasicAuthenticator::UMN_IDP_ENTITY_ID,
+      'Shib-Authentication-Method' => 'urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified',
+      'Shib-AuthnContext-Class' => 'urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified',
+      'Shib-Application-ID' => 'default',
+      'Shib-Session-Index' => 'abcdefg',
+      'Shib-Session-ID' => '_' . md5(microtime() . rand()),
+      'Shib-Authentication-Instant' => date('c')
+    );
+    return;
+  }
+  /**
+   * Fixate a mock user into the $_SERVER superglobal
+   * 
+   * @param array $user_params
+   * @param string $use_headers Write attributes into HTTP_ headers
+   * @access public
+   * @return bool
+   */
+  public function setUser(array $user_params, $use_headers = false)
+  {
+    $this->setCommonAttributes();
+    foreach (array_merge($this->commonAttributes, $user_params) as $attr => $value) {
+      if ($use_headers) {
+        $attr = BasicAuthenticator::convertToHTTPHeaderName($attr);
+      }
+      $_SERVER[$attr] = $value;
+    }
+  }
+  /**
+   * Make sure all keys are strings and have sub-arrays
+   * 
+   * @param array $users 
+   * @access protected
+   * @return bool
+   */
   protected function validateUserArray(array $users)
   {
-    // Make sure all keys are string and have sub-arrays
     foreach ($users as $key => $array) {
       if (!is_string($key) || ctype_digit(strval($key)) || !is_array($array)) {
         return false;
