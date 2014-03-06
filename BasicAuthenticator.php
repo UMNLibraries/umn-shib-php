@@ -112,6 +112,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
         // Maybe an exception is appropriate and this is confusing and inconsistent.
         try {
           $mock->setUser($mock->getUser($mockusername));
+          $this->isMockUser = true;
         }
         catch (Mock\Exception\UserNotFoundException $e) {
           trigger_error($e->getMessage(), E_USER_NOTICE);
@@ -460,6 +461,16 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   public function getHandlerURL()
   {
     return $this->handlerURL;
+  }
+  /**
+   * Return true if a mock user was loaded
+   * 
+   * @access public
+   * @return bool
+   */
+  public function isMockUser()
+  {
+    return $this->isMockUser;
   }
   /**
    * Handle HTTP redirection

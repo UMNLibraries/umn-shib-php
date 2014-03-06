@@ -250,6 +250,15 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
     // Non-existent, null
     $this->assertNull($shib->getAttributeValues('notexist'));
   }
+  public function testMockNoEnvSet()
+  {
+    // The required environment vars aren't set, receiving a mock user
+    // via $_GET should have no effect
+    $_GET['UMNSHIB_MOCK_USER'] = 'user2';
+    $shib = new BasicAuthenticator();
+    $this->assertEquals('user', $shib->getAttributeValue('uid'));
+    $this->assertFalse($shib->isMockUser());
+  }
   /**
    * @expectedException \PHPUnit_Framework_Error_Warning
    */

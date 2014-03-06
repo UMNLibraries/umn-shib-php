@@ -51,6 +51,7 @@ class BasicAuthenticatorMockEnvTest extends \PHPUnit_Framework_TestCase
     
     $this->assertEquals('user1', $shib->getAttributeValue('uid'));
     $this->assertEmpty($shib->getAttributeValue('REMOTE_USER'));
+    $this->assertTrue($shib->isMockUser());
   }
   public function testMockUserQueryString()
   {
@@ -59,6 +60,7 @@ class BasicAuthenticatorMockEnvTest extends \PHPUnit_Framework_TestCase
     $shib = new BasicAuthenticator();
     $this->assertEquals('user2', $shib->getAttributeValue('uid'));
     $this->assertEquals('user2', $shib->getAttributeValue('REMOTE_USER'));
+    $this->assertTrue($shib->isMockUser());
   }
   public function testMockUserQueryStringUnknown()
   {
@@ -67,5 +69,6 @@ class BasicAuthenticatorMockEnvTest extends \PHPUnit_Framework_TestCase
     $_GET['UMNSHIB_MOCK_USER'] = 'baduser';
     $shib = new BasicAuthenticator();
   }
+  
 }
 ?>
