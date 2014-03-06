@@ -180,8 +180,14 @@ Or ideally it could be set in the server itself, allowing test/production
 environments proper segregation.  To set it with Apache `mod_rewrite`, use:
 
 ```apache
+# Via mod_rewrite if you need to match complex conditions
 RewriteEngine On
 RewriteRule ^ - [E=UMNSHIB_ALLOW_MOCK_USER:true]
+RewriteRule ^ - [E=UMNSHIB_MOCK_USER_FILE:/path/to/mock_users.php]
+
+# Or via SetEnv if you don't need to do it conditionally
+SetEnv UMNSHIB_ALLOW_MOCK_USER true
+SetEnv UMNSHIB_MOCK_USER_FILE /path/to/mock_users.php
 ```
 
 ### Defining mock users
