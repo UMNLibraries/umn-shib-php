@@ -4,6 +4,14 @@ namespace UMNShib\Basic\Mock;
 
 use UMNShib\Basic\BasicAuthenticator;
 
+/**
+ * Retrieval factory for mock Shibboleth user requests
+ * 
+ * @package UMNShib\Basic
+ * @copyright [Copyright]
+ * @author Michael Berkowski <mjb@umn.edu> 
+ * @license [License]
+ */
 class UserFactory
 {
   protected $users = array();
