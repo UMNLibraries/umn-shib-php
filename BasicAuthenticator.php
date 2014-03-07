@@ -94,7 +94,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   public function __construct($loginOptions = array(), $logoutOptions = array())
   {
     // Probe for a mock-allowed environment and load the user
-    if (getenv('UMNSHIB_ALLOW_MOCK_USER') != false) {
+    if (filter_var(getenv('UMNSHIB_ALLOW_MOCK_USER'), FILTER_VALIDATE_BOOLEAN) != false) {
       $mock = new Mock\UserFactory(getenv('UMNSHIB_MOCK_USER_FILE'));
       // $_GET is preferred over env
       if (getenv('UMNSHIB_MOCK_USER') != false) {
@@ -105,6 +105,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
         $mockusername = trim($_GET['UMNSHIB_MOCK_USER']);
       }
       if (!empty($mockusername)) {
+        // Log attempts at mocking a user
         // Don't throw an exception on an invalid user, convert it to E_NOTICE
         // If in implementation there's no try/catch this won't break things
         // 

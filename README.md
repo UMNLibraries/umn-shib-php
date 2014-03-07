@@ -21,6 +21,31 @@ to your academic or departmental unit.
 This library will make certain default assumptions about the Shibboleth SP
 environment, but can generally be configured to behave differently.  
 
+## Installation
+Preferably you should be installing via [Composer](http://getcomposer.org).
+
+Add the following to your project's `composer.json` to attach it to this repo on
+`github.umn.edu` and load the package.
+
+```json
+"repositories": [
+    {
+        "type": "vcs",
+        "url": "git@github.umn.edu:umn-community-shib/umn-shib-php.git"
+    }
+],
+"require": {
+    "umn-community-shib/basic-authenticator": "~1.0.0"
+}
+```
+
+If you are not using Composer, you can still use it by manually including the
+necessary files.
+
+require_once '/path/to/umnshib/BasicAuthenticator.php';
+// If you plan to use user mocking, you'll need this too.
+require_once '/path/to/umnshib/Mock/UserFactory.php';
+
 ## Basic Object-oriented or Procedural Usage
 Like many modern PHP libraries aiming to provide backward compatibility and ease
 of integration into almost any PHP application, this one provides API access
@@ -189,6 +214,10 @@ RewriteRule ^ - [E=UMNSHIB_MOCK_USER_FILE:/path/to/mock_users.php]
 SetEnv UMNSHIB_ALLOW_MOCK_USER true
 SetEnv UMNSHIB_MOCK_USER_FILE /path/to/mock_users.php
 ```
+
+Note: `UMNSHIB_ALLOW_MOCK_USER` is processed via `filter_var()` to detect
+"boolean-like" values. That means strings like "true, On, Yes, 1" will be `true`
+while strings like `false, no, off, 0` and anything else will be `false`.
 
 ### Defining mock users
 Mock users are defined in a PHP file, also pointed to by an environment
