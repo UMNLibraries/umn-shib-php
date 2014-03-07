@@ -2,6 +2,8 @@
 
 namespace UMNShib\Basic\Mock;
 
+require_once('UserFactoryInterface.php');
+
 use UMNShib\Basic\BasicAuthenticator;
 
 /**
