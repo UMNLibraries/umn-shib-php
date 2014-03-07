@@ -40,7 +40,8 @@ Add the following to your project's `composer.json` to attach it to this repo on
 ```
 
 If you are not using Composer, you can still use it by manually including the
-necessary files.
+necessary files. _This is not really supported, but will work if you manually
+`include/require` all the necessary files_.
 
 require_once '/path/to/umnshib/BasicAuthenticator.php';
 // If you plan to use user mocking, you'll need this too.
