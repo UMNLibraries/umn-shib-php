@@ -80,10 +80,10 @@ use \UMNShib\Basic;
 
 // Object-oriented style
 $umnshib = new BasicAuthenticator();
-$attributes = $umnshib->getAttributesOrRedirectToLogin();
+$attributes = $umnshib->getAttributesOrRequestLogin();
 
 // Procedural style
-$attributes = umnshib_getAttributesOrRedirectToLogin();
+$attributes = umnshib_getAttributesOrRequestLogin();
 ```
 
 ## Configuration
@@ -121,7 +121,7 @@ authentication, 2-factor (MKey) logins, return URLs, forced authentication, or
 alternate entity ID.
 
 Methods like `buildLoginURL(), buildLogoutURL(), redirectToLogin(),
-redirectToLogout(), getAttributesOrRedirectToLogin()` accept an array paramter
+redirectToLogout(), getAttributesOrRequestLogin()` accept an array paramter
 of options. It should be an associative array of `'key' => 'value'` pairs
 corresponding to the options documented on the [UMN Community Shibboleth API
 wiki](https://github.umn.edu/umn-community-shib/umn-shib-api/wiki/UMN-Shibboleth-Basic-API) for `buildLoginURL()` and `buildLogoutURL()`.
