@@ -57,7 +57,7 @@ Internally, the procedural interface merely wraps the object-oriented one, and
 must discard some functionality where it is unable to maintain state.
 
 ```php
-use \UMNShib\Basic;
+use UMNShib\Basic\BasicAuthenticator;
 
 // Example Object-Oriented instantiation and redirect to login:
 $umnshib = new BasicAuthenticator();
@@ -76,7 +76,7 @@ is also possible to make a single call to either retrieve all known attributes
 as an array or redirect to a login session:
 
 ```php
-use \UMNShib\Basic;
+use UMNShib\Basic\BasicAuthenticator;
 
 // Object-oriented style
 $umnshib = new BasicAuthenticator();
