@@ -35,7 +35,7 @@ Add the following to your project's `composer.json` to attach it to this repo on
     }
 ],
 "require": {
-    "umn-community-shib/basic-authenticator": "~1.0.0"
+    "umn-community-shib/basic-authenticator": ">=1.1.0"
 }
 ```
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace UMNShib\Basic;
+use UMNShib\Basic\BasicAuthenticator;
 
 /**
  * Procedural interface to BasicAuthenticator API implementation for UMN Shibboleth

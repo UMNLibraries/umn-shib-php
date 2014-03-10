@@ -1,7 +1,5 @@
 <?php
 
-namespace UMNShib\Basic\Test;
-
 use UMNShib\Basic\BasicAuthenticator;
 
 class UmnShibFunctionsTest extends \PHPUnit_Framework_TestCase
@@ -41,7 +39,7 @@ class UmnShibFunctionsTest extends \PHPUnit_Framework_TestCase
   public function testLoginURL()
   {
     // Build a most basic login URL
-    $url = \UMNShib\Basic\umnshib_buildLoginURL();
+    $url = umnshib_buildLoginURL();
 
     // It should begin with https:// followed by http_host followed by default_handler_url
     $expected_base = "https://{$this->http_host}{$this->default_handler_url}/Login";
@@ -52,12 +50,12 @@ class UmnShibFunctionsTest extends \PHPUnit_Framework_TestCase
     $this->assertEquals($expected_qs, substr($url, -strlen($expected_qs)), "The generated URL should end with a urlencoded target= URL");
 
     // Build a login URL with isPassive
-    $url = \UMNShib\Basic\umnshib_buildLoginURL(array('passive' => true));
+    $url = umnshib_buildLoginURL(array('passive' => true));
     $expected_qs_passive = $expected_qs . "&isPassive=true";
     $this->assertEquals($expected_qs_passive, substr($url, -strlen($expected_qs_passive)), "The generated URL should end with isPassive=true");
 
     // Mkey option
-    $url = \UMNShib\Basic\umnshib_buildLoginURL(array('mkey' => true));
+    $url = umnshib_buildLoginURL(array('mkey' => true));
     $expected_mkey = "&authnContextClassRef=" . urlencode(BasicAuthenticator::UMN_MKEY_AUTHN_CONTEXT);
     $this->assertEquals($expected_mkey, substr($url, -strlen($expected_mkey)), "The generated URL should end with an encoded authnContextClass for MKEY");
 
@@ -65,7 +63,7 @@ class UmnShibFunctionsTest extends \PHPUnit_Framework_TestCase
     $expected_base_alt = "https://{$this->http_host}{$this->alt_request_uri}";
     $expected_qs_target = "target=" . urlencode($expected_base_alt);
     $expected_qs_force = "&forceAuthn=true";
-    $url = \UMNShib\Basic\umnshib_buildLoginURL(array('target' => $expected_base_alt, 'forceAuthn' => true));
+    $url = umnshib_buildLoginURL(array('target' => $expected_base_alt, 'forceAuthn' => true));
     $this->assertTrue(strpos($url, $expected_qs_target) !== false, "The generated URL should contain the encoded explicit target");
     $this->assertTrue(strpos($url, $expected_qs_force) !== false, "The generated URL should contain a forceAuthn=true parameter");
   }
@@ -73,7 +71,7 @@ class UmnShibFunctionsTest extends \PHPUnit_Framework_TestCase
   public function testLogoutURL()
   {
     // Build a basic logout URL
-    $url = \UMNShib\Basic\umnshib_buildLogoutURL();
+    $url = umnshib_buildLogoutURL();
 
     // It should begin with https:// followed by http_host followed by default_handler_url and /Logout
     $expected_base = "https://{$this->http_host}{$this->default_handler_url}/Logout";
@@ -84,12 +82,12 @@ class UmnShibFunctionsTest extends \PHPUnit_Framework_TestCase
     $this->assertEquals($expected_qs, substr($url, -strlen($expected_qs)), "A default logout URL should contain an encoded return to the IdP logout URL");
 
     // Build a SP-only logout, contains no query string, should match the original base URL
-    $url = \UMNShib\Basic\umnshib_buildLogoutURL(array('logoutFromIdP' => false));
+    $url = umnshib_buildLogoutURL(array('logoutFromIdP' => false));
     $this->assertEquals($expected_base, $url, "Without an IdP logout, the generated URL should have no query string");
 
     // Build an IdP logout with an explicit additional return URL
     $return_url = "https://{$this->http_host}{$this->alt_request_uri}";
-    $url = \UMNShib\Basic\umnshib_buildLogoutURL(array('logoutFromIdP' => true, 'return' => $return_url));
+    $url = umnshib_buildLogoutURL(array('logoutFromIdP' => true, 'return' => $return_url));
 
     $expected_return = "?return=" . urlencode(BasicAuthenticator::UMN_IDP_LOGOUT_URL . "?return={$return_url}");
     $this->assertEquals($expected_return, substr($url, -strlen($expected_return)), "The generated URL should contain an encoded IdP logout with an additional encoded return URL inside it");
@@ -101,73 +99,73 @@ class UmnShibFunctionsTest extends \PHPUnit_Framework_TestCase
     $idp = $_SERVER['Shib-Identity-Provider'];
     $logged_in_since = $_SERVER['Shib-Authentication-Instant'];
 
-    $this->assertTrue(\UMNShib\Basic\umnshib_hasSession());
-    $this->assertEquals($idp, \UMNShib\Basic\umnshib_getIdPEntityId());
-    $this->assertEquals(strtotime($logged_in_since), \UMNShib\Basic\umnshib_loggedInSince());
-    $this->assertTrue(\UMNShib\Basic\umnshib_loggedInWithMKey());
+    $this->assertTrue(umnshib_hasSession());
+    $this->assertEquals($idp, umnshib_getIdPEntityId());
+    $this->assertEquals(strtotime($logged_in_since), umnshib_loggedInSince());
+    $this->assertTrue(umnshib_loggedInWithMKey());
 
     // Check a non-expired session
-    $this->assertFalse(\UMNShib\Basic\umnshib_hasSessionTimedOut());
+    $this->assertFalse(umnshib_hasSessionTimedOut());
     // Check an expired session passing $maxAge = 1
-    $this->assertTrue(\UMNShib\Basic\umnshib_hasSessionTimedOut(1));
+    $this->assertTrue(umnshib_hasSessionTimedOut(1));
 
     // Repeat these after setting for header access instead of Env access
     $idp = $_SERVER['HTTP_SHIB_IDENTITY_PROVIDER'];
     $logged_in_since = $_SERVER['HTTP_SHIB_AUTHENTICATION_INSTANT'];
-    $this->assertEquals($idp, \UMNShib\Basic\umnshib_getIdPEntityId(true));
-    $this->assertEquals(strtotime($logged_in_since), \UMNShib\Basic\umnshib_loggedInSince(true));
+    $this->assertEquals($idp, umnshib_getIdPEntityId(true));
+    $this->assertEquals(strtotime($logged_in_since), umnshib_loggedInSince(true));
 
     // Test for no session
     unset($_SERVER['HTTP_SHIB_IDENTITY_PROVIDER']);
-    $this->assertFalse(\UMNShib\Basic\umnshib_hasSession(true));
+    $this->assertFalse(umnshib_hasSession(true));
   }
 
   public function testGetSingleAttributes()
   {
     // Single string attribute
-    $this->assertEquals('user@example.com', \UMNShib\Basic\umnshib_getAttributeValue('eppn'));
+    $this->assertEquals('user@example.com', umnshib_getAttributeValue('eppn'));
 
     // Delimited attribute returns the full string
-    $this->assertEquals('one;two;three', \UMNShib\Basic\umnshib_getAttributeValue('multiAttribute'));
+    $this->assertEquals('one;two;three', umnshib_getAttributeValue('multiAttribute'));
 
     // Non-existent, null
-    $this->assertNull(\UMNShib\Basic\umnshib_getAttributeValues('notexist'));
+    $this->assertNull(umnshib_getAttributeValues('notexist'));
   }
 
   public function testGetSingleAttributesFromHeaders()
   {
     // Single string attribute
-    $this->assertEquals('user@example.com', \UMNShib\Basic\umnshib_getAttributeValue('eppn', true));
+    $this->assertEquals('user@example.com', umnshib_getAttributeValue('eppn', true));
 
     // Delimited attribute returns the full string
-    $this->assertEquals('one;two;three', \UMNShib\Basic\umnshib_getAttributeValue('multiAttribute', true));
+    $this->assertEquals('one;two;three', umnshib_getAttributeValue('multiAttribute', true));
 
     // Non-existent, null
-    $this->assertNull(\UMNShib\Basic\umnshib_getAttributeValues('notexist', true));
+    $this->assertNull(umnshib_getAttributeValues('notexist', true));
   }
 
   public function testMultiAttributes()
   {
     // Known multi attribute returns an array
-    $this->assertEquals(array('one','two','three'), \UMNShib\Basic\umnshib_getAttributeValues('multiAttribute'));
+    $this->assertEquals(array('one','two','three'), umnshib_getAttributeValues('multiAttribute'));
   
     // Single value, non-delimited returns an array with one value
-    $this->assertEquals(array('user'), \UMNShib\Basic\umnshib_getAttributeValues('uid'));
+    $this->assertEquals(array('user'), umnshib_getAttributeValues('uid'));
 
     // Non-existent, null
-    $this->assertNull(\UMNShib\Basic\umnshib_getAttributeValues('notexist'));
+    $this->assertNull(umnshib_getAttributeValues('notexist'));
   }
 
   public function testMultiAttributesFromHeaders()
   {
     // Known multi attribute returns an array
-    $this->assertEquals(array('one','two','three'), \UMNShib\Basic\umnshib_getAttributeValues('multiAttribute', true));
+    $this->assertEquals(array('one','two','three'), umnshib_getAttributeValues('multiAttribute', true));
   
     // Single value, non-delimited returns an array with one value
-    $this->assertEquals(array('user'), \UMNShib\Basic\umnshib_getAttributeValues('uid', true));
+    $this->assertEquals(array('user'), umnshib_getAttributeValues('uid', true));
 
     // Non-existent, null
-    $this->assertNull(\UMNShib\Basic\umnshib_getAttributeValues('notexist', true));
+    $this->assertNull(umnshib_getAttributeValues('notexist', true));
   }
 }
 ?>
