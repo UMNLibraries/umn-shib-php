@@ -252,14 +252,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    */
   public function hasSession() {
     $idps = array(self::UMN_IDP_ENTITY_ID, self::UMN_TEST_IDP_ENTITY_ID, self::UMN_SPOOF_IDP_ENTITY_ID);
-
-    if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_ENV) {
-      return in_array($this->getIdPEntityId(), $idps);
-    }
-    if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_HEADERS) {
-      return in_array($this->getIdPEntityId(), $idps);
-    }
-    return false;
+    return in_array($this->getIdPEntityId(), $idps);
   }
   /**
    * Does a valid session exist with the SP?
