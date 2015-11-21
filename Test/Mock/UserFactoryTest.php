@@ -107,5 +107,50 @@ class UserFactoryTest extends \PHPUnit_Framework_TestCase
       $this->assertEquals($user[$attr], $_SERVER[$server_attr]);
     }
   }
+  /**
+   * @runInSeparateProcess
+   */
+  public function testUnsetUserNoHeaders()
+  {
+    $user = array(
+      'uid' => 'mockuser',
+      'eppn' => 'mockuser@exmaple.com'
+    );
+
+    $factory = new UserFactory("{$this->fixture_path}/good_mock.php");
+    $factory->setUser($user);
+    // Just make sure it was set in the first place
+    $this->assertArrayHasKey('uid', $_SERVER);
+
+    // Unset the user 
+    $factory->unsetUser();
+
+    foreach ($user as $attr => $value) {
+      $this->assertArrayNotHasKey($attr, $_SERVER);
+    }
+  }
+  /**
+   * @runInSeparateProcess
+   */
+  public function testUnsetUserHeaders()
+  {
+    $user = array(
+      'uid' => 'mockuser',
+      'eppn' => 'mockuser@exmaple.com'
+    );
+
+    $factory = new UserFactory("{$this->fixture_path}/good_mock.php");
+    $factory->setUser($user, true);
+    // Just make sure it was set in the first place
+    $this->assertArrayHasKey('HTTP_UID', $_SERVER);
+
+    // Unset the user 
+    $factory->unsetUser(true);
+
+    foreach ($user as $attr => $value) {
+      $attr = BasicAuthenticator::convertToHTTPHeaderName($attr);
+      $this->assertArrayNotHasKey($attr, $_SERVER);
+    }
+  }
 }
 ?>

@@ -19,6 +19,7 @@ class UserFactory
   protected $users = array();
   protected $userFile = '';
   protected $commonAttributes = array();
+  protected $user = array();
 
   /**
    * Receives a file path to load Mock Users
@@ -110,19 +111,40 @@ class UserFactory
    * Fixate a mock user into the $_SERVER superglobal
    * 
    * @param array $user_params
-   * @param string $use_headers Write attributes into HTTP_ headers
+   * @param boolean $use_headers Write attributes into HTTP_ headers
    * @access public
-   * @return bool
+   * @return void
    */
   public function setUser(array $user_params, $use_headers = false)
   {
+    // Clear any existing user attrs
+    $this->unsetUser($use_headers);
+
     $this->setCommonAttributes();
     foreach (array_merge($this->commonAttributes, $user_params) as $attr => $value) {
+      $this->user[$attr] = $value;
       if ($use_headers) {
         $attr = BasicAuthenticator::convertToHTTPHeaderName($attr);
       }
       $_SERVER[$attr] = $value;
     }
+  }
+  /**
+   * Unset the current user's attributes
+   *
+   * @param boolean $use_headers Unset attributes as HTTP_ headers
+   * @access public
+   * @return void
+   */
+  public function unsetUser($use_headers = false)
+  {
+    foreach ($this->user as $attr => $value) {
+      if ($use_headers) {
+        $attr = BasicAuthenticator::convertToHTTPHeaderName($attr);
+      }
+      unset($_SERVER[$attr]);
+    }
+    $this->user = array();
   }
   /**
    * Make sure all keys are strings and have sub-arrays
