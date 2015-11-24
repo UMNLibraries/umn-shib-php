@@ -220,6 +220,54 @@ Note: `UMNSHIB_ALLOW_MOCK_USER` is processed via `filter_var()` to detect
 "boolean-like" values. That means strings like "true, On, Yes, 1" will be `true`
 while strings like `false, no, off, 0` and anything else will be `false`.
 
+### Extended Features
+This package includes an `ExtendedAuthenticator` class with a few additional 
+features not defined in the basic authenticator API.  In particular, it has 
+methods to look for exact matches among multi-value attributes, and a parser for 
+the `eduCourseMember` enrolled/instructor course definitions attribute.
+
+```php
+use UMNShib\Basic\ExtendedAuthenticator;
+
+$shib = new ExtendedAuthenticator();
+
+// Retrieve EduCourseMemberCourse objects for all courses
+$courses = $shib->getCourses();
+
+foreach ($coures as $course) {
+  if ($course->isStudent()) {
+    echo "User is enrolled as a student...";
+  }
+  else if ($course->isInstructor()) {
+    echo "User is assigned as an instructor...";
+  }
+
+  echo $course->getTerm();
+  echo $course->getSubject();
+  echo $course->getCourseNumber();
+  echo $course->getSection();
+
+  // Etc...
+  // See Util/EduCourseMemberCourse.php for available methods
+}
+```
+
+Check multi-value attributes by exact match or regular expression
+
+```php
+use UMNShib\Basic\ExtendedAuthenticator;
+
+$shib = new ExtendedAuthenticator();
+
+// $_SERVER['umnRole'] is tc.staff.lib.ABCD.EFGH;tc.dgre.ba.psych
+
+var_dump($shib->hasAttributeValue('umnRole', 'tc.staff.lib.ABCD.EFGH'));
+// bool(true)
+
+var_dump($shib->hasAttributeRegex('umnRole', '/.dgre.ba/'));
+// bool(true)
+```
+
 ### Defining mock users
 Mock users are defined in a PHP file, also pointed to by an environment
 variable.  _PHP isn't a great option but it has no dependencies and is
@@ -306,6 +354,14 @@ print_r($_SERVER);
 ## Testing
 Tests are executed with PHPUnit.  There are _two_ test configurations, owing to
 a dependency on environment variables for mock users.
+
+```shell
+# Run basic tests
+$ phpunit
+
+# Run mock user tests
+$ phpunit -c phpunit-mockenv.xml
+```
 
 ### Primary testing
 For basic functionality, `phpunit.xml.dist` has full test coverage. Executing
