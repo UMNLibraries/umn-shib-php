@@ -324,6 +324,33 @@ setenv('UMNSHIB_MOCK_USER', 'user1');
 // Or via Apache mod_rewrite as above
 ```
 
+#### If your framework modifies or takes over $_SERVER
+Some testing frameworks make it difficult to work with `$_SERVER` and it becomes 
+necessary to set users with method calls. You may operate directory on 
+`Mock\UserFactory`:
+
+```php
+// Instantiate a user factory and set attributes for a mock user manually
+$mockuser_factory = new \UMNShib\Basic\Mock\UserFactory('/path/to/mockuser/filename.php');
+$mockuser_factory->setUser($mockuser_factory->getUser('username'));
+
+// To unset them:
+$mockuser_factory->unsetUser();
+```
+
+Another method is to set the `UMNSHIB_MOCK_USER` environment variable, then simply instantiate
+a new `BasicAuthenticator`. When it is created, the mock user will be set into `$_SERVER` but
+this method is a little less explicit.
+
+```php
+// Set the desired mock user into ENV and create a new authenticator
+putenv('UMNSHIB_MOCK_USER=username');
+$shib = new \UMNShib\Basic\BasicAuthenticator();
+
+// The mock user attributes should now be present
+print_r($_SERVER);
+```
+
 ## Testing
 Tests are executed with PHPUnit.  There are _two_ test configurations, owing to
 a dependency on environment variables for mock users.
