@@ -71,9 +71,9 @@ function umnshib_redirectToLogout(array $options = array())
  * @param bool $use_headers Retrieve attributes from HTTP_ headers, default false
  * @return bool
  */
-function umnshib_hasSession($use_headers = false)
+function umnshib_hasSession($use_headers = false, $prefix = '')
 {
-  $shib = _umnshib_get_object($use_headers);
+  $shib = _umnshib_get_object($use_headers, $prefix);
   return $shib->hasSession();
 }
 /**
@@ -84,9 +84,9 @@ function umnshib_hasSession($use_headers = false)
  * @param bool $use_headers Retrieve attributes from HTTP_ headers, default false
  * @return bool
  */
-function umnshib_hasSessionTimedOut($maxAge = BasicAuthenticator::UMN_SESSION_MAX_AGE, $use_headers = false)
+function umnshib_hasSessionTimedOut($maxAge = BasicAuthenticator::UMN_SESSION_MAX_AGE, $use_headers = false, $prefix = '')
 {
-  $shib = _umnshib_get_object($use_headers);
+  $shib = _umnshib_get_object($use_headers, $prefix);
   return $shib->hasSessionTimedOut($maxAge);
 }
 /**
@@ -95,14 +95,14 @@ function umnshib_hasSessionTimedOut($maxAge = BasicAuthenticator::UMN_SESSION_MA
  * @param bool $use_headers Retrieve attributes from HTTP_ headers, default false
  * @return integer
  */
-function umnshib_loggedInSince($use_headers = false)
+function umnshib_loggedInSince($use_headers = false, $prefix = '')
 {
-  $shib = _umnshib_get_object($use_headers);
+  $shib = _umnshib_get_object($use_headers, $prefix);
   return $shib->loggedInSince();
 }
-function umnshib_getAttributesOrRequestLogin(array $options = array(), $use_headers = false)
+function umnshib_getAttributesOrRequestLogin(array $options = array(), $use_headers = false, $prefix = '')
 {
-  $shib = _umnshib_get_object($use_headers);
+  $shib = _umnshib_get_object($use_headers, $prefix);
   return $shib->getAttributesOrRequestLogin($options);
 }
 /**
@@ -111,9 +111,9 @@ function umnshib_getAttributesOrRequestLogin(array $options = array(), $use_head
  * @param bool $use_headers Retrieve attributes from HTTP_ headers, default false
  * @return string
  */
-function umnshib_getIdPEntityId($use_headers = false)
+function umnshib_getIdPEntityId($use_headers = false, $prefix = '')
 {
-  $shib = _umnshib_get_object($use_headers);
+  $shib = _umnshib_get_object($use_headers, $prefix);
   return $shib->getIdPEntityId();
 }
 /**
@@ -122,9 +122,9 @@ function umnshib_getIdPEntityId($use_headers = false)
  * @param bool $use_headers Retrieve attributes from HTTP_ headers, default false
  * @return bool
  */
-function umnshib_loggedInWithMKey($use_headers = false)
+function umnshib_loggedInWithMKey($use_headers = false, $prefix = '')
 {
-  $shib = _umnshib_get_object($use_headers);
+  $shib = _umnshib_get_object($use_headers, $prefix);
   return $shib->loggedInWithMKey();
 }
 /**
@@ -155,9 +155,9 @@ function umnshib_getAttributeNames(array $requestedAttributes = array())
  * @param bool $use_headers Retrieve attributes from HTTP_ headers, default false
  * @return string
  */
-function umnshib_getAttributeValue($name, $use_headers = false)
+function umnshib_getAttributeValue($name, $use_headers = false, $prefix = '')
 {
-  $shib = _umnshib_get_object($use_headers);
+  $shib = _umnshib_get_object($use_headers, $prefix);
   return $shib->getAttributeValue($name);
 }
 /**
@@ -168,9 +168,9 @@ function umnshib_getAttributeValue($name, $use_headers = false)
  * @param bool $use_headers Retrieve attributes from HTTP_ headers, default false
  * @return array
  */
-function umnshib_getAttributeValues($name, $delimiter = ';', $use_headers = false)
+function umnshib_getAttributeValues($name, $delimiter = ';', $use_headers = false, $prefix = '')
 {
-  $shib = _umnshib_get_object($use_headers);
+  $shib = _umnshib_get_object($use_headers, $prefix);
   return $shib->getAttributeValues($name);
 }
 
@@ -180,12 +180,13 @@ function umnshib_getAttributeValues($name, $delimiter = ';', $use_headers = fals
  * @param bool $use_headers Retrive attributes from HTTP_ headers, default false
  * @return BasicAuthenticator
  */
-function _umnshib_get_object($use_headers = false)
+function _umnshib_get_object($use_headers = false, $prefix = '')
 {
   $shib = new BasicAuthenticator();
   if ($use_headers) {
     $shib->setAttributeAccessMethod(BasicAuthenticator::UMN_ATTRS_FROM_HEADERS);
   }
+  $shib->setAttributePrefix($prefix);
   return $shib;
 }
 ?>
