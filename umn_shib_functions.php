@@ -69,6 +69,7 @@ function umnshib_redirectToLogout(array $options = array())
  * Returns true if the Shib-Identity-Provider is non-empty and one of our 3 expected values
  * 
  * @param bool $use_headers Retrieve attributes from HTTP_ headers, default false
+ * @param string $prefix Attribute prefix
  * @return bool
  */
 function umnshib_hasSession($use_headers = false, $prefix = '')
@@ -82,6 +83,7 @@ function umnshib_hasSession($use_headers = false, $prefix = '')
  * 
  * @param integer $maxAge Maximum session lifetime in minutes, default 180 (3 hours)
  * @param bool $use_headers Retrieve attributes from HTTP_ headers, default false
+ * @param string $prefix Attribute prefix
  * @return bool
  */
 function umnshib_hasSessionTimedOut($maxAge = BasicAuthenticator::UMN_SESSION_MAX_AGE, $use_headers = false, $prefix = '')
@@ -93,6 +95,7 @@ function umnshib_hasSessionTimedOut($maxAge = BasicAuthenticator::UMN_SESSION_MA
  * Returns the Shib-Authentication-Instant as a Unix timestamp
  * 
  * @param bool $use_headers Retrieve attributes from HTTP_ headers, default false
+ * @param string $prefix Attribute prefix
  * @return integer
  */
 function umnshib_loggedInSince($use_headers = false, $prefix = '')
@@ -109,6 +112,7 @@ function umnshib_getAttributesOrRequestLogin(array $options = array(), $use_head
  * Returns the Shib-Identity-Provider if non-empty
  * 
  * @param bool $use_headers Retrieve attributes from HTTP_ headers, default false
+ * @param string $prefix Attribute prefix
  * @return string
  */
 function umnshib_getIdPEntityId($use_headers = false, $prefix = '')
@@ -120,6 +124,7 @@ function umnshib_getIdPEntityId($use_headers = false, $prefix = '')
  * Returns true if the user was logged in with an MKey
  * 
  * @param bool $use_headers Retrieve attributes from HTTP_ headers, default false
+ * @param string $prefix Attribute prefix
  * @return bool
  */
 function umnshib_loggedInWithMKey($use_headers = false, $prefix = '')
@@ -153,6 +158,7 @@ function umnshib_getAttributeNames(array $requestedAttributes = array())
  * 
  * @param string $name 
  * @param bool $use_headers Retrieve attributes from HTTP_ headers, default false
+ * @param string $prefix Attribute prefix
  * @return string
  */
 function umnshib_getAttributeValue($name, $use_headers = false, $prefix = '')
@@ -166,6 +172,7 @@ function umnshib_getAttributeValue($name, $use_headers = false, $prefix = '')
  * @param string $name 
  * @param string $delimiter
  * @param bool $use_headers Retrieve attributes from HTTP_ headers, default false
+ * @param string $prefix Attribute prefix
  * @return array
  */
 function umnshib_getAttributeValues($name, $delimiter = ';', $use_headers = false, $prefix = '')
@@ -178,6 +185,7 @@ function umnshib_getAttributeValues($name, $delimiter = ';', $use_headers = fals
  * Return a BasicAuthenticator object and set its attribute access method
  *
  * @param bool $use_headers Retrive attributes from HTTP_ headers, default false
+ * @param string $prefix Attribute prefix
  * @return BasicAuthenticator
  */
 function _umnshib_get_object($use_headers = false, $prefix = '')
