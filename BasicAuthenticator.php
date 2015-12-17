@@ -79,6 +79,15 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    */
   protected $customIdPEntityId;
   /**
+   * Prefix string expected on attribute names, as defined in shibboleth2.xml
+   * <ApplicationDefaults attributePrefix='PREFIX_'> property
+   * Commonly used with Apache mod_proxy_ajp
+   *
+   * @var string
+   * @access protected
+   */
+  protected $attributePrefix = '';
+  /**
    * Default attributes supplied by UMN IdP
    *
    * @var array
@@ -388,6 +397,28 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     $this->attributeSource = $accessMethod;
   }
   /**
+   * Returns the defined attribute prefix
+   *
+   * @access public
+   * @return string
+   */
+  public function getAttributePrefix()
+  {
+    return $this->attributePrefix;
+  }
+  /**
+   * Set a new attribute prefix, used for all environment variable attribute access
+   * See https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPApplication#NativeSPApplication-Attributes
+   *
+   * @param string $attributePrefix
+   * @access public
+   * @return void
+   */
+  public function setAttributePrefix($attributePrefix)
+  {
+    $this->attributePrefix = $attributePrefix;
+  }
+  /**
    * Return the array of default attribute names
    *
    * @access public
@@ -540,6 +571,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Return the bare attribute name or HTTP_ header version according to $attributeSource
+   * prefixing the attributePrefix to bare attribute names if defined.
    *
    * @param string $name Shibboleth attribute name
    * @access protected
@@ -549,6 +581,11 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   {
     if ($this->getAttributeAccessMethod() == self::UMN_ATTRS_FROM_HEADERS) {
       $name = self::convertToHTTPHeaderName($name);
+    }
+    else {
+      // Prefix is only used for environment vars, never headers
+      // though actual docs saying so are elusive...
+      $name = $this->attributePrefix . $name;
     }
     return $name;
   }

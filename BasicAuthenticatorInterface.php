@@ -26,7 +26,10 @@ Interface BasicAuthenticatorInterface
   public function loggedInSince();
   public function loggedInWithMKey();
 
+  public function getAttributePrefix();
+  public function setAttributePrefix($prefix);
   public function getAttributeAccessMethod();
+  public function setAttributeAccessMethod($accessMethod);
   public function getDefaultAttributeNames();
   public function getAttributeNames(array $requestedAttributes);
   public function getAttributeValue($name);

@@ -10,7 +10,7 @@ standard attributes.
 
 The implementation, like the API which describes it, is intended to provide a
 baseline set of common functions coupled with access to the standard set of
-Shibboleth attributes Identity Management exposes to all service providers. It 
+Shibboleth attributes Identity Management exposes to all service providers. It
 has been designed to be easily extensible, allowing you to add features specific
 to your academic or departmental unit.
 
@@ -19,7 +19,7 @@ to your academic or departmental unit.
 - A server with the Shibboleth Native SP installed, configured, and running.
 
 This library will make certain default assumptions about the Shibboleth SP
-environment, but can generally be configured to behave differently.  
+environment, but can generally be configured to behave differently.
 
 ## Installation
 Preferably you should be installing via [Composer](http://getcomposer.org).
@@ -113,6 +113,37 @@ attributes include a `$useHeaders` boolean parameter, which defaults to `false`.
 // Procedural example retrieving attributes from HTTP headers,
 // pass true as the $useHeaders parameter0
 $uid = umnshib_getAttributeValue('uid', true);
+```
+
+### Custom IdP entityId
+By default, `BasicAuthenticator` looks for known production, test, spoof UMN
+entityId strings to determine if a session is active. If you plan to use it
+against a non-UMN IdP, you may specify the custom IdP entityId.
+
+This is never needed for normal usage at UMN.
+
+```php
+$shib = new BasicAuthenticator();
+$shib->setCustomIdPEntityId('https://example.edu/shibboleth/idp/entityid');
+```
+
+### Attribute prefix
+Some server environments, notably those using mod_proxy_ajp, may define an
+`attributePrefix` in shibboleth2.xml `<ApplicationDefaults attributePrefix="CUSTOMPREFIX_"/>`.
+In that situation, you must also specify  the custom prefix on your `BasicAuthenticator`.
+
+```php
+$shib = new BasicAuthenticator();
+$shib->setAttributePrefix('PREFIX_');
+
+Note: The custom prefix only makes sense when retrieving attributes from
+environment variables. Shibboleth does not appear to use it when accessing
+attributes via HTTP headers, and in fact the presence of `attributePrefix` in
+`<ApplicationDefaults/>` seems to entirely override `ShibUseHeaders` and imply
+the use of environment variables.
+
+Be sure to read [the Native SP documentation on
+`attributePrefix`](https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPApplication#NativeSPApplication-Attributes).
 ```
 
 ### Login / Logout Options
@@ -221,9 +252,9 @@ Note: `UMNSHIB_ALLOW_MOCK_USER` is processed via `filter_var()` to detect
 while strings like `false, no, off, 0` and anything else will be `false`.
 
 ### Extended Features
-This package includes an `ExtendedAuthenticator` class with a few additional 
-features not defined in the basic authenticator API.  In particular, it has 
-methods to look for exact matches among multi-value attributes, and a parser for 
+This package includes an `ExtendedAuthenticator` class with a few additional
+features not defined in the basic authenticator API.  In particular, it has
+methods to look for exact matches among multi-value attributes, and a parser for
 the `eduCourseMember` enrolled/instructor course definitions attribute.
 
 ```php
@@ -325,8 +356,8 @@ setenv('UMNSHIB_MOCK_USER', 'user1');
 ```
 
 #### If your framework modifies or takes over $_SERVER
-Some testing frameworks make it difficult to work with `$_SERVER` and it becomes 
-necessary to set users with method calls. You may operate directory on 
+Some testing frameworks make it difficult to work with `$_SERVER` and it becomes
+necessary to set users with method calls. You may operate directory on
 `Mock\UserFactory`:
 
 ```php

@@ -268,6 +268,19 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
 
     $this->assertTrue($shib->hasSession());
   }
+  public function testAttributePrefix()
+  {
+    $shib = new BasicAuthenticator();
+    $shib->setAttributePrefix('PHPUNIT_');
+
+    $this->assertNull($shib->getAttributeValue('uid'), "No prefixed uid attribute should be present");
+    // Set a prefixed uid for this test method
+    $_SERVER['PHPUNIT_uid'] = 'prefixed_uid';
+    $this->assertEquals('prefixed_uid', $shib->getAttributeValue('uid'), "The accessed attribute should be the prefixed one");
+
+    $shib->setAttributeAccessMethod(BasicAuthenticator::UMN_ATTRS_FROM_HEADERS);
+    $this->assertEquals('user', $shib->getAttributeValue('uid'), "When using HTTP headers, the attribute should not be accessed with a prefix");
+  }
   public function testMockNoEnvSet()
   {
     // The required environment vars aren't set, receiving a mock user
