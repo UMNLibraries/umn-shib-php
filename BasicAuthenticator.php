@@ -8,11 +8,11 @@ require_once('umn_shib_functions.php');
 
 /**
  * BasicAuthenticator API implementation for UMN Shibboleth
- * 
+ *
  * @uses BasicAuthenticatorInterface
  * @package UMNShib\BasicAuthenticator
  * @copyright [Copyright]
- * @author Michael Berkowski <mjb@umn.edu> 
+ * @author Michael Berkowski <mjb@umn.edu>
  * @license [License]
  */
 class BasicAuthenticator implements BasicAuthenticatorInterface
@@ -30,7 +30,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
 
   const UMN_ATTRS_FROM_ENV = 'from_environment';
   const UMN_ATTRS_FROM_HEADERS = 'from_headers';
-  
+
   // Extended constants
   const UMN_SESSION_MAX_AGE = 10800;
   const SERVER_TYPE_IIS = 'iis';
@@ -40,7 +40,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   /**
    * From what source are attributes read (HTTP_SHIB_ headers or environment variables)?
    * Values should be self::UMN_ATTRS_FROM_ENV, self::UMN_ATTRS_FROM_HEADERS
-   * 
+   *
    * @var mixed
    * @access protected
    */
@@ -48,21 +48,21 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   /**
    * URI path of the Shibboleth SessionInitiator
    * Default '/Shibboleth.sso'
-   * 
+   *
    * @var string
    * @access protected
    */
   protected $handlerURL = '/Shibboleth.sso';
   /**
    * Default login options
-   * 
+   *
    * @var array
    * @access protected
    */
   protected $loginOptions = array();
   /**
    * Default logout options
-   * 
+   *
    * @var array
    * @access protected
    */
@@ -92,12 +92,12 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   );
   /**
    * Set to true if a mock user was established
-   * 
+   *
    * @var bool
    * @access protected
    */
   protected $isMockUser = false;
-  
+
   public function __construct($loginOptions = array(), $logoutOptions = array())
   {
     // Probe for a mock-allowed environment and load the user
@@ -115,7 +115,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
         // Log attempts at mocking a user
         // Don't throw an exception on an invalid user, convert it to E_NOTICE
         // If in implementation there's no try/catch this won't break things
-        // 
+        //
         // Note: I'm not sure if I like this. Open to suggestions regarding its utility
         // Maybe an exception is appropriate and this is confusing and inconsistent.
         try {
@@ -137,7 +137,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Construct a Session Initiator URL based on options
-   * 
+   *
    * @param array $options Associative array of options will be merged with defaults or options supplied in the constructor
    * @access public
    * @return string
@@ -183,7 +183,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Construct a logout URL based on options
-   * 
+   *
    * @param array $options Associative array of options will be merged with defaults or options supplied in the constructor
    * @access public
    * @return string
@@ -221,8 +221,8 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Redirect to a login URL, calls buildLoginURL()
-   * 
-   * @param array $options 
+   *
+   * @param array $options
    * @access public
    * @return void
    */
@@ -232,8 +232,8 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Redirect to a logout URL, calls buildLogoutURL()
-   * 
-   * @param array $options 
+   *
+   * @param array $options
    * @access public
    * @return void
    */
@@ -243,7 +243,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Returns the Shib-Identity-Provider if non-empty
-   * 
+   *
    * @access public
    * @return string
    */
@@ -274,7 +274,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Returns true if the Shib-Identity-Provider is non-empty and one of our 3 expected values
-   * 
+   *
    * @access public
    * @return bool
    */
@@ -288,13 +288,13 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   /**
    * Does a valid session exist with the SP?
    * Returns true if the elapsed time since authentication is greater than maxAge
-   * 
+   *
    * @param integer $maxAge Maximum session lifetime in seconds, default UMN_SESSION_MAX_AGE
    * @access public
    * @return bool
    */
   public function hasSessionTimedOut($maxAge = self::UMN_SESSION_MAX_AGE)
-  { 
+  {
     // If no session can be found, just return
     if (!$this->hasSession()) {
       return true;
@@ -309,7 +309,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Returns the Shib-Authentication-Instant as a Unix timestamp
-   * 
+   *
    * @access public
    * @return integer
    */
@@ -319,9 +319,9 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Returns the current session's attributes or forces a login redirect if no session is present
-   * 
+   *
    * @param array $options Array of login options, see buildLoginURL()
-   * @param array $requestedAttributes 
+   * @param array $requestedAttributes
    * @param integer $maxAge Maximum session lifetime in seconds, default UMN_SESSION_MAX_AGE
    * @access public
    * @return array
@@ -343,7 +343,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Returns true if the user was logged in with an MKey
-   * 
+   *
    * @access public
    * @return bool
    */
@@ -356,7 +356,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Return the attribute access method (ENV, or HTTP headers)
-   * 
+   *
    * @access public
    * @return bool
    */
@@ -373,10 +373,10 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     return $this->attributeSource;
   }
   /**
-   * Set the attribute access method, allows us to force the use of HTTP headers even absent 
+   * Set the attribute access method, allows us to force the use of HTTP headers even absent
    * their having been populated by ShibUseHeaders
-   * 
-   * @param mixed $accessMethod 
+   *
+   * @param mixed $accessMethod
    * @access public
    * @return bool
    */
@@ -389,7 +389,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Return the array of default attribute names
-   * 
+   *
    * @access public
    * @return array
    */
@@ -399,8 +399,8 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * getAttributeNames
-   * 
-   * @param array $requestedAttributes 
+   *
+   * @param array $requestedAttributes
    * @access public
    * @return array
    */
@@ -409,8 +409,8 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Return an attribute value
-   * 
-   * @param string $name 
+   *
+   * @param string $name
    * @access public
    * @return string
    */
@@ -421,8 +421,8 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Return an array of values from a delimited, multi-value attribute
-   * 
-   * @param string $name 
+   *
+   * @param string $name
    * @param string $delimiter
    * @access public
    * @return array
@@ -435,8 +435,8 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * getAttributes
-   * 
-   * @param array $requestedAttributes 
+   *
+   * @param array $requestedAttributes
    * @access public
    * @return array
    */
@@ -450,7 +450,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Return the currently configured login options
-   * 
+   *
    * @access public
    * @return array
    */
@@ -460,7 +460,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Return the currently configured logout options
-   * 
+   *
    * @access public
    * @return array
    */
@@ -470,8 +470,8 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Set the path of the handlerURL (default /Shibboleth.sso) and return it
-   * 
-   * @param mixed $handlerURL 
+   *
+   * @param mixed $handlerURL
    * @access public
    * @return string
    */
@@ -482,7 +482,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Return the current handlerURL fragment  like /Shibboleth.sso
-   * 
+   *
    * @access public
    * @return string
    */
@@ -492,7 +492,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Return true if a mock user was loaded
-   * 
+   *
    * @access public
    * @return bool
    */
@@ -502,7 +502,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Handle HTTP redirection
-   * 
+   *
    * @param string $url
    * @access protected
    * @return void
@@ -514,7 +514,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Returns the server type (iis, apache)
-   * 
+   *
    * @access protected
    * @return string
    */
@@ -530,7 +530,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Return the base URL, protocol and hostname, up to but not including the REQUEST_URI
-   * 
+   *
    * @access protected
    * @return string
    */
@@ -540,7 +540,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   }
   /**
    * Return the bare attribute name or HTTP_ header version according to $attributeSource
-   * 
+   *
    * @param string $name Shibboleth attribute name
    * @access protected
    * @return string
@@ -555,8 +555,8 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   /**
    * Return a string representing the HTTP header corresponding to the input $shibProperty
    * This means replacing hyphens with underscores and prepending HTTP_
-   * 
-   * @param mixed $shibProperty 
+   *
+   * @param mixed $shibProperty
    * @access protected
    * @return bool
    */
@@ -567,7 +567,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   /**
    * Issue a warning if arg_separator.output is not set to '&' in php.ini
    * which causes http_build_query() to create invalid URLs for the Shibboleth SP
-   * 
+   *
    * @static
    * @access protected
    * @return void
