@@ -19,6 +19,8 @@ Interface BasicAuthenticatorInterface
   public function redirectToLogout(array $options = array());
 
   public function getIdPEntityId();
+  public function getCustomIdPEntityId();
+  public function setCustomIdPEntityId($customIdPEntityId);
   public function hasSession();
   public function hasSessionTimedOut($maxAge = 10800);
   public function loggedInSince();

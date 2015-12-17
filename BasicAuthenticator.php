@@ -72,8 +72,15 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     'IdPLogoutURL' => self::UMN_IDP_ENTITY_ID
   );
   /**
+   * Custom IdP entity ID used when checking session status
+   *
+   * @var string
+   * @access protected
+   */
+  protected $customIdPEntityId;
+  /**
    * Default attributes supplied by UMN IdP
-   * 
+   *
    * @var array
    * @access protected
    */
@@ -245,6 +252,27 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     return !empty($_SERVER[$name]) ? $_SERVER[$name] : null;
   }
   /**
+   * Return the custom IdP entity ID if one has been defined
+   *
+   * @access public
+   * @return string
+   */
+  public function getCustomIdPEntityId()
+  {
+    return $this->customIdPEntityId;
+  }
+  /**
+   * Set a customized IdP entity ID
+   *
+   * @param string $customIdPEntityId
+   * @access public
+   * @return void
+   */
+  public function setCustomIdPEntityId($customIdPEntityId)
+  {
+    $this->customIdPEntityId = $customIdPEntityId;
+  }
+  /**
    * Returns true if the Shib-Identity-Provider is non-empty and one of our 3 expected values
    * 
    * @access public
@@ -252,6 +280,9 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    */
   public function hasSession() {
     $idps = array(self::UMN_IDP_ENTITY_ID, self::UMN_TEST_IDP_ENTITY_ID, self::UMN_SPOOF_IDP_ENTITY_ID);
+    if (!empty($this->customIdPEntityId)) {
+      $idps[] = $this->customIdPEntityId;
+    }
     return in_array($this->getIdPEntityId(), $idps);
   }
   /**

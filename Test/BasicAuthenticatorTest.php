@@ -250,6 +250,24 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
     // Non-existent, null
     $this->assertNull($shib->getAttributeValues('notexist'));
   }
+  public function testCustomEntityIdAccessors()
+  {
+    $entityId = 'https://example.com/shibboleth/IdP';
+    $shib = new BasicAuthenticator();
+    $shib->setCustomIdPEntityId($entityId);
+    $this->assertEquals($entityId, $shib->getCustomIdPEntityId());
+  }
+  public function testCustomEntityIdSession()
+  {
+    $entityId = 'https://example.com/shibboleth/IdP';
+    $shib = new BasicAuthenticator();
+    $shib->setCustomIdPEntityId($entityId);
+
+    // Overwrite IdP in $_SERVER for this test method
+    $_SERVER['Shib-Identity-Provider'] = $entityId;
+
+    $this->assertTrue($shib->hasSession());
+  }
   public function testMockNoEnvSet()
   {
     // The required environment vars aren't set, receiving a mock user
