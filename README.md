@@ -136,6 +136,11 @@ In that situation, you must also specify  the custom prefix on your `BasicAuthen
 $shib = new BasicAuthenticator();
 $shib->setAttributePrefix('PREFIX_');
 
+// Prefix argument to umnshib_*() functions
+echo umnshib_getAttributeValue('uid', false, 'PREFIX_');
+
+```
+
 Note: The custom prefix only makes sense when retrieving attributes from
 environment variables. Shibboleth does not appear to use it when accessing
 attributes via HTTP headers, and in fact the presence of `attributePrefix` in
@@ -144,8 +149,6 @@ the use of environment variables.
 
 Be sure to read [the Native SP documentation on
 `attributePrefix`](https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPApplication#NativeSPApplication-Attributes).
-```
-
 ### Login / Logout Options
 Several options are available to facilitate features like passive
 authentication, 2-factor (MKey) logins, return URLs, forced authentication, or
