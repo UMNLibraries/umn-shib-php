@@ -28,7 +28,8 @@ class UmnShibFunctionsTest extends \PHPUnit_Framework_TestCase
       'uid' => 'user',
       'HTTP_UID' => 'user',
       'multiAttribute' => 'one;two;three',
-      'HTTP_MULTIATTRIBUTE' => 'one;two;three'
+      'HTTP_MULTIATTRIBUTE' => 'one;two;three',
+      'PREFIX_prefattr' => 'prefixed attribute'
     );
     $GLOBALS['_SERVER'] = array_merge($GLOBALS['_SERVER'], $shib_server);
     
@@ -166,6 +167,11 @@ class UmnShibFunctionsTest extends \PHPUnit_Framework_TestCase
 
     // Non-existent, null
     $this->assertNull(umnshib_getAttributeValues('notexist', true));
+  }
+
+  public function testAttributePrefix()
+  {
+    $this->assertEquals('prefixed attribute', umnshib_getAttributeValue('prefattr', false, 'PREFIX_'));
   }
 }
 ?>
