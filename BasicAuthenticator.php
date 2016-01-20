@@ -46,6 +46,14 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    */
   protected $attributeSource = self::UMN_ATTRS_FROM_ENV;
   /**
+   * Base URL of the Service Provider, protocol and host
+   * Defaults to https:// with the hostname from $_SERVER['HTTP_HOST']
+   *
+   * @var string
+   * @access protected
+   */
+  protected $baseURL = null;
+  /**
    * URI path of the Shibboleth SessionInitiator
    * Default '/Shibboleth.sso'
    *
@@ -109,6 +117,9 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
 
   public function __construct($loginOptions = array(), $logoutOptions = array())
   {
+    // Default base URL based on HTTP_HOST
+    $this->baseURL = 'https://' . $_SERVER['HTTP_HOST'];
+
     // Probe for a mock-allowed environment and load the user
     if (filter_var(getenv('UMNSHIB_ALLOW_MOCK_USER'), FILTER_VALIDATE_BOOLEAN) != false) {
       $mock = new Mock\UserFactory(getenv('UMNSHIB_MOCK_USER_FILE'));
@@ -565,9 +576,22 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    * @access protected
    * @return string
    */
-  protected function getBaseURL()
+  public function getBaseURL()
   {
-    return 'https://' . $_SERVER['HTTP_HOST'];
+    return $this->baseURL;
+  }
+  /**
+   * Set the server's base URL to a custom value
+   * Useful if you need to generate a login/logout URL for a server other than
+   * the one this code is running on
+   *
+   * @param string $baseURL Base URL should include protocol and hostname, like https://example.com
+   * @access public
+   * @return void
+   */
+  public function setBaseURL($baseURL)
+  {
+    $this->baseURL = $baseURL;
   }
   /**
    * Return the bare attribute name or HTTP_ header version according to $attributeSource

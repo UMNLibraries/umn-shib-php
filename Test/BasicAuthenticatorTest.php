@@ -10,6 +10,7 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
   private $alt_handler_url = '/shibboleth/Shibboleth.sso';
   private $request_uri = '/test/index.html?param=123';
   private $alt_request_uri ='/altdir/test/';
+  private $alt_base_url = 'https://example.edu';
 
   public function setUp()
   {
@@ -44,7 +45,7 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
       }
     }
     // And other keys we set
-    $keys = array( 
+    $keys = array(
       'HTTP_HOST',
       'REQUEST_URI',
       'REMOTE_USER',
@@ -70,7 +71,7 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
     // Default login options are empty, so these should be the only ones set
     $this->assertEquals($login_options, $shib->getLoginOptions());
   }
-  public function testConstructorLogoutOptions() 
+  public function testConstructorLogoutOptions()
   {
     // Input overwrites some defaults and adds an option
     $input_logout_options = array(
@@ -162,6 +163,23 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
     $this->assertEquals($expected_base, substr($url, 0, strlen($expected_base)), "The protocol, hostname, and explicitly set Shibboleth handler should match");
   }
 
+  public function testAlternateBaseURL()
+  {
+    $shib = new BasicAuthenticator();
+    $shib->setBaseURL($this->alt_base_url);
+    $loginurl = $shib->buildLoginURL();
+    $logouturl = $shib->buildLogoutURL();
+
+    $this->assertEquals($this->alt_base_url, $shib->getBaseURL(), "The base URL should match the explicitly set URL");
+
+    $expected_login = "{$this->alt_base_url}{$this->default_handler_url}/Login";
+    $this->assertEquals($expected_login, substr($loginurl, 0, strlen($expected_login)), "The generated login URL should use the explicit base URL");
+
+    $expected_logout = "{$this->alt_base_url}{$this->default_handler_url}/Logout";
+    $this->assertEquals($expected_logout, substr($logouturl, 0, strlen($expected_logout)), "The generated logout URL should use the explicit base URL");
+
+  }
+
   public function testSessionState()
   {
     $shib = new BasicAuthenticator();
@@ -228,7 +246,7 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
     $shib = new BasicAuthenticator();
     // Known multi attribute returns an array
     $this->assertEquals(array('one','two','three'), $shib->getAttributeValues('multiAttribute'));
-  
+
     // Single value, non-delimited returns an array with one value
     $this->assertEquals(array('user'), $shib->getAttributeValues('uid'));
 
@@ -243,7 +261,7 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
 
     // Known multi attribute returns an array
     $this->assertEquals(array('one','two','three'), $shib->getAttributeValues('multiAttribute'));
-  
+
     // Single value, non-delimited returns an array with one value
     $this->assertEquals(array('user'), $shib->getAttributeValues('uid'));
 
