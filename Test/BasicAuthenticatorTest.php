@@ -142,6 +142,12 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
     $url = $shib->buildLogoutURL(array('logoutFromIdP' => false));
     $this->assertEquals($expected_base, $url, "Without an IdP logout, the generated URL should have no query string");
 
+    // Build SP-only logout with return=
+    $return_url = "https://{$this->http_host}{$this->alt_request_uri}";
+    $url = $shib->buildLogoutURL(array('logoutFromIdP' => false, 'return' => $return_url));
+    $expected_return = "?return=" . urlencode($return_url);
+    $this->assertEquals($expected_base . $expected_return, $url, "Without an IdP logout, the generated URL should still include a return URL");
+
     // Build an IdP logout with an explicit additional return URL
     $return_url = "https://{$this->http_host}{$this->alt_request_uri}";
     $url = $shib->buildLogoutURL(array('logoutFromIdP' => true, 'return' => $return_url));

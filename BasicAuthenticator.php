@@ -226,6 +226,12 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
       // The whole return URL is encoded, including the secondary ?return=
       $params['return'] = $logoutReturn;
     }
+    // Append the return URL without the IdP passthrough
+    else {
+      if (!empty($options['return'])) {
+        $params['return'] = $options['return'];
+      }
+    }
 
     // Bad ini value for arg_separator.output only applies with 2+ args
     if (count($params) > 1) {
