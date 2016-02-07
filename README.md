@@ -97,8 +97,8 @@ $umnshib->setHandlerURL('/some/other/path/Shibboleth.sso');
 ```
 
 ### Alternate hostnames
-By default, URLs generated will use the hostname from PHP's `HTTP_HOST` CGI 
-environment. If you want to generate URLs for a different host or protocol, you 
+By default, URLs generated will use the hostname from PHP's `HTTP_HOST` CGI
+environment. If you want to generate URLs for a different host or protocol, you
 an use `setBaseURL()`.  You must include the protocol and hostname.
 
 ```php
