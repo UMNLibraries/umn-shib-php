@@ -122,6 +122,14 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    */
   protected $isMockUser = false;
 
+  /**
+   * __construct
+   *
+   * @param array $loginOptions
+   * @param array $logoutOptions
+   * @param array $sourceArray Alternate attribute source array; if unspecified, $_SERVER is used
+   * @access public
+   */
   public function __construct($loginOptions = array(), $logoutOptions = array(), $sourceArray = null)
   {
     // Default base URL based on HTTP_HOST

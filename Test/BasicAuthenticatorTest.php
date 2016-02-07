@@ -309,6 +309,15 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
     $shib->setAttributeAccessMethod(BasicAuthenticator::UMN_ATTRS_FROM_HEADERS);
     $this->assertEquals('user', $shib->getAttributeValue('uid'), "When using HTTP headers, the attribute should not be accessed with a prefix");
   }
+  public function testAlternateSourceArray()
+  {
+    $source = array('altattr' => 'alternate attribute value');
+    $shib = new BasicAuthenticator(array(), array());
+    $this->assertNull($shib->getAttributeValue('altattr'));
+
+    $shib = new BasicAuthenticator(array(), array(), $source);
+    $this->assertEquals('alternate attribute value', $shib->getAttributeValue('altattr'));
+  }
   public function testMockNoEnvSet()
   {
     // The required environment vars aren't set, receiving a mock user
