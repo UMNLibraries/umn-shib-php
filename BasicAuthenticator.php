@@ -1,6 +1,5 @@
 <?php
 
-
 namespace UMNShib\Basic;
 
 require_once('BasicAuthenticatorInterface.php');
@@ -108,6 +107,14 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     'umnDID'
   );
   /**
+   * Array source from which attributes are retrieved. $_SERVER is used
+   * if none is otherwise provided
+   *
+   * @var array
+   * @access protected
+   */
+  protected $sourceArray;
+  /**
    * Set to true if a mock user was established
    *
    * @var bool
@@ -115,7 +122,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    */
   protected $isMockUser = false;
 
-  public function __construct($loginOptions = array(), $logoutOptions = array())
+  public function __construct($loginOptions = array(), $logoutOptions = array(), $sourceArray = null)
   {
     // Default base URL based on HTTP_HOST
     $this->baseURL = 'https://' . $_SERVER['HTTP_HOST'];
@@ -154,6 +161,8 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     if (is_array($logoutOptions)) {
       $this->logoutOptions = array_merge($this->logoutOptions, $logoutOptions);
     }
+    // Attribute source array if provided, or $_SERVER
+    $this->sourceArray = is_array($sourceArray) ? $sourceArray : $_SERVER;
   }
   /**
    * Construct a Session Initiator URL based on options
@@ -274,8 +283,9 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    * @return string
    */
   public function getIdPEntityId() {
+    return $this->getAttributeValue('Shib-Identity-Provider');
     $name = $this->normalizeAttributeName('Shib-Identity-Provider');
-    return !empty($_SERVER[$name]) ? $_SERVER[$name] : null;
+    return !empty($this->sourceArray[$name]) ? $this->sourceArray[$name] : null;
   }
   /**
    * Return the custom IdP entity ID if one has been defined
@@ -465,7 +475,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   public function getAttributeValue($name) {
     $value = null;
     $name = $this->normalizeAttributeName($name);
-    return !empty($_SERVER[$name]) ? $_SERVER[$name] : null;
+    return !empty($this->sourceArray[$name]) ? $this->sourceArray[$name] : null;
   }
   /**
    * Return an array of values from a delimited, multi-value attribute
@@ -478,7 +488,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   public function getAttributeValues($name, $delimiter = ';') {
     $value = null;
     $name = $this->normalizeAttributeName($name);
-    if (!empty($_SERVER[$name])) $value = explode($delimiter, $_SERVER[$name]);
+    if (!empty($this->sourceArray[$name])) $value = explode($delimiter, $this->sourceArray[$name]);
     return $value;
   }
   /**
@@ -492,7 +502,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     $attrs = array_flip(array_merge($this->getAttributeNames(), $requestedAttributes));
     foreach ($attrs as $key => $value) {
       $key = $this->normalizeAttributeName($key);
-      $attrs[$key] = isset($_SERVER[$key]) ? $_SERVER[$key] : null;
+      $attrs[$key] = isset($this->sourceArray[$key]) ? $this->sourceArray[$key] : null;
     }
     return $attrs;
   }
