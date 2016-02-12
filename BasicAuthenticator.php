@@ -122,7 +122,6 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
 
     // Probe for a mock-allowed environment and load the user
     if (filter_var(getenv('UMNSHIB_ALLOW_MOCK_USER'), FILTER_VALIDATE_BOOLEAN) != false) {
-      $mock = new Mock\UserFactory(getenv('UMNSHIB_MOCK_USER_FILE'));
       // $_GET is preferred over env
       if (getenv('UMNSHIB_MOCK_USER') != false) {
         $mockusername = trim(getenv('UMNSHIB_MOCK_USER'));
@@ -139,6 +138,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
         // Note: I'm not sure if I like this. Open to suggestions regarding its utility
         // Maybe an exception is appropriate and this is confusing and inconsistent.
         try {
+          $mock = new Mock\UserFactory(getenv('UMNSHIB_MOCK_USER_FILE'));
           $mock->setUser($mock->getUser($mockusername));
           $this->isMockUser = true;
         }
