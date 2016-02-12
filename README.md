@@ -97,8 +97,8 @@ $umnshib->setHandlerURL('/some/other/path/Shibboleth.sso');
 ```
 
 ### Alternate hostnames
-By default, URLs generated will use the hostname from PHP's `HTTP_HOST` CGI 
-environment. If you want to generate URLs for a different host or protocol, you 
+By default, URLs generated will use the hostname from PHP's `HTTP_HOST` CGI
+environment. If you want to generate URLs for a different host or protocol, you
 an use `setBaseURL()`.  You must include the protocol and hostname.
 
 ```php
@@ -263,6 +263,23 @@ SetEnv UMNSHIB_MOCK_USER_FILE /path/to/mock_users.php
 Note: `UMNSHIB_ALLOW_MOCK_USER` is processed via `filter_var()` to detect
 "boolean-like" values. That means strings like "true, On, Yes, 1" will be `true`
 while strings like `false, no, off, 0` and anything else will be `false`.
+
+### Injecting an attribute source
+By default, attributes are read from the `$_SERVER` superglobal. For testing
+purposes, you may wish to inject an associative array of attributes. The
+constructor accepts as its 3rd parameter a `$sourceArray` for that purpose.
+
+```php
+use UMNShib\Basic\ExtendedAuthenticator;
+
+$alternateSource = array(
+  'Shib-Identity-Provider' => 'https://example.edu/idp',
+  'uid' => 'fakeuser'
+);
+
+// Pass the array source to the constructor
+$shib = new BasicAuthenticator($loginOptions, $logoutOptions, $alternateSource);
+```
 
 ### Extended Features
 This package includes an `ExtendedAuthenticator` class with a few additional

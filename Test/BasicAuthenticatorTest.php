@@ -217,6 +217,8 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
 
     // Test for no session
     unset($_SERVER['HTTP_SHIB_IDENTITY_PROVIDER']);
+    $shib = new BasicAuthenticator();
+    $shib->setAttributeAccessMethod(BasicAuthenticator::UMN_ATTRS_FROM_HEADERS);
     $this->assertFalse($shib->hasSession());
   }
 
@@ -284,11 +286,11 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
   public function testCustomEntityIdSession()
   {
     $entityId = 'https://example.com/shibboleth/IdP';
-    $shib = new BasicAuthenticator();
-    $shib->setCustomIdPEntityId($entityId);
-
     // Overwrite IdP in $_SERVER for this test method
     $_SERVER['Shib-Identity-Provider'] = $entityId;
+
+    $shib = new BasicAuthenticator();
+    $shib->setCustomIdPEntityId($entityId);
 
     $this->assertTrue($shib->hasSession());
   }
@@ -300,10 +302,21 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
     $this->assertNull($shib->getAttributeValue('uid'), "No prefixed uid attribute should be present");
     // Set a prefixed uid for this test method
     $_SERVER['PHPUNIT_uid'] = 'prefixed_uid';
+    $shib = new BasicAuthenticator();
+    $shib->setAttributePrefix('PHPUNIT_');
     $this->assertEquals('prefixed_uid', $shib->getAttributeValue('uid'), "The accessed attribute should be the prefixed one");
 
     $shib->setAttributeAccessMethod(BasicAuthenticator::UMN_ATTRS_FROM_HEADERS);
     $this->assertEquals('user', $shib->getAttributeValue('uid'), "When using HTTP headers, the attribute should not be accessed with a prefix");
+  }
+  public function testAlternateSourceArray()
+  {
+    $source = array('altattr' => 'alternate attribute value');
+    $shib = new BasicAuthenticator(array(), array());
+    $this->assertNull($shib->getAttributeValue('altattr'));
+
+    $shib = new BasicAuthenticator(array(), array(), $source);
+    $this->assertEquals('alternate attribute value', $shib->getAttributeValue('altattr'));
   }
   public function testMockNoEnvSet()
   {
