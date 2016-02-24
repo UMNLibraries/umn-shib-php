@@ -52,18 +52,19 @@ class UmnShibFunctionsTest extends \PHPUnit_Framework_TestCase
 
     // Build a login URL with isPassive
     $url = umnshib_buildLoginURL(array('passive' => true));
-    $expected_qs_passive = $expected_qs . "&isPassive=true";
-    $this->assertEquals($expected_qs_passive, substr($url, -strlen($expected_qs_passive)), "The generated URL should end with isPassive=true");
+    $expected_qs_passive = "isPassive=true&" . $expected_qs;
+    $this->assertEquals($expected_qs_passive, substr($url, -strlen($expected_qs_passive)), "The generated URL should begin with isPassive=true");
 
     // Mkey option
     $url = umnshib_buildLoginURL(array('mkey' => true));
-    $expected_mkey = "&authnContextClassRef=" . urlencode(BasicAuthenticator::UMN_MKEY_AUTHN_CONTEXT);
-    $this->assertEquals($expected_mkey, substr($url, -strlen($expected_mkey)), "The generated URL should end with an encoded authnContextClass for MKEY");
+    $expected_mkey = "authnContextClassRef=" . urlencode(BasicAuthenticator::UMN_MKEY_AUTHN_CONTEXT) . "&";
+    $mkey_qs = preg_replace('/^' . preg_quote($expected_base, '/') . '\?/', '', $url);
+    $this->assertEquals($expected_mkey, substr($mkey_qs, 0, strlen($expected_mkey)), "The generated URL should begin with an encoded authnContextClass for MKEY");
 
     // Multiple options (explicit target and forceAuthn)
     $expected_base_alt = "https://{$this->http_host}{$this->alt_request_uri}";
     $expected_qs_target = "target=" . urlencode($expected_base_alt);
-    $expected_qs_force = "&forceAuthn=true";
+    $expected_qs_force = "forceAuthn=true&";
     $url = umnshib_buildLoginURL(array('target' => $expected_base_alt, 'forceAuthn' => true));
     $this->assertTrue(strpos($url, $expected_qs_target) !== false, "The generated URL should contain the encoded explicit target");
     $this->assertTrue(strpos($url, $expected_qs_force) !== false, "The generated URL should contain a forceAuthn=true parameter");
