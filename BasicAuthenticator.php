@@ -132,8 +132,13 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
    */
   public function __construct($loginOptions = array(), $logoutOptions = array(), $sourceArray = null)
   {
+    // Attribute source array if provided, or $_SERVER (reference because the superglobal may change)
+    if (is_array($sourceArray)) {
+      $this->sourceArray = $sourceArray;
+    }
+    else $this->sourceArray = &$_SERVER;
     // Default base URL based on HTTP_HOST
-    $this->baseURL = 'https://' . $_SERVER['HTTP_HOST'];
+    $this->baseURL = 'https://' . (isset($this->sourceArray['HTTP_HOST']) ? $this->sourceArray['HTTP_HOST'] : 'example.com');
 
     // Probe for a mock-allowed environment and load the user
     if (filter_var(getenv('UMNSHIB_ALLOW_MOCK_USER'), FILTER_VALIDATE_BOOLEAN) != false) {
@@ -169,8 +174,6 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     if (is_array($logoutOptions)) {
       $this->logoutOptions = array_merge($this->logoutOptions, $logoutOptions);
     }
-    // Attribute source array if provided, or $_SERVER
-    $this->sourceArray = is_array($sourceArray) ? $sourceArray : $_SERVER;
   }
   /**
    * Construct a Session Initiator URL based on options

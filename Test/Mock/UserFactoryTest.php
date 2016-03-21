@@ -152,5 +152,21 @@ class UserFactoryTest extends \PHPUnit_Framework_TestCase
       $this->assertArrayNotHasKey($attr, $_SERVER);
     }
   }
+  /**
+   * @runInSeparateProcess
+   */
+  public function testAltSourceArray()
+  {
+    $source = array('attr99' => 99);
+    $user = array(
+      'uid' => 'mockuser',
+      'eppn' => 'mockuser@exmaple.com'
+    );
+    $factory = new UserFactory("{$this->fixture_path}/good_mock.php");
+    $factory->setSourceArray($source);
+    $factory->setUser($user);
+
+    $this->assertArrayHasKey('Shib-Authentication-Instant', $source, 'The source array reference should have common attributes loaded');
+  }
 }
 ?>

@@ -20,6 +20,7 @@ class UserFactory
   protected $userFile = '';
   protected $commonAttributes = array();
   protected $user = array();
+  protected $sourceArray = array();
 
   /**
    * Receives a file path to load Mock Users
@@ -49,7 +50,14 @@ class UserFactory
 
     $this->users = $users;
     $this->userFile = realpath($userFile);
+    // Default to superglobal
+    $this->setSourceArray($_SERVER);
     return;
+  }
+  public function setSourceArray(&$sourceArray)
+  {
+    unset($this->sourceArray);
+    $this->sourceArray = &$sourceArray;
   }
   /**
    * Return the user having the requested username
@@ -108,7 +116,7 @@ class UserFactory
     return;
   }
   /**
-   * Fixate a mock user into the $_SERVER superglobal
+   * Fixate a mock user into the sourceArray reference
    * 
    * @param array $user_params
    * @param boolean $use_headers Write attributes into HTTP_ headers
@@ -126,7 +134,7 @@ class UserFactory
       if ($use_headers) {
         $attr = BasicAuthenticator::convertToHTTPHeaderName($attr);
       }
-      $_SERVER[$attr] = $value;
+      $this->sourceArray[$attr] = $value;
     }
   }
   /**
@@ -142,7 +150,7 @@ class UserFactory
       if ($use_headers) {
         $attr = BasicAuthenticator::convertToHTTPHeaderName($attr);
       }
-      unset($_SERVER[$attr]);
+      unset($this->sourceArray[$attr]);
     }
     $this->user = array();
   }
