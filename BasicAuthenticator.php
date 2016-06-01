@@ -26,6 +26,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   const UMN_SPOOF_IDP_LOGOUT_URL = 'https://idp-spoof-test.shib.umn.edu/idp/LogoutUMN';
 
   const UMN_MKEY_AUTHN_CONTEXT = 'https://www.umn.edu/shibboleth/classes/authncontext/mkey';
+  const UMN_DUO_AUTHN_CONTEXT = 'https://www.umn.edu/shibboleth/classes/authncontext/duo';
 
   const UMN_ATTRS_FROM_ENV = 'from_environment';
   const UMN_ATTRS_FROM_HEADERS = 'from_headers';
@@ -201,6 +202,9 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     }
     if (isset($options['mkey']) && $options['mkey'] == true) {
       $params['authnContextClassRef'] = self::UMN_MKEY_AUTHN_CONTEXT;
+    }
+    if (isset($options['duo']) && $options['duo'] == true) {
+      $params['authnContextClassRef'] = self::UMN_DUO_AUTHN_CONTEXT;
     }
     if (isset($options['authnContextClassRef']) && !empty($options['authnContextClassRef'])) {
       $params['authnContextClassRef'] = $options['authnContextClassRef'];
@@ -399,6 +403,18 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     if ($this->hasSession()) {
       $auth_method = $this->getAttributeValue('Shib-Authentication-Method');
       return $auth_method == self::UMN_MKEY_AUTHN_CONTEXT;
+    }
+    return false;
+  }
+  /**
+   * Returns true if the user was logged in with Duo two-factor.
+   *
+   * @access public
+   * @return bool
+   */
+  public function loggedInWithDuo() {
+    if ($this->hasSession()) {
+      return $this->getAttributeValue('Shib-Authentication-Method') == self::UMN_DUO_AUTHN_CONTEXT;
     }
     return false;
   }
