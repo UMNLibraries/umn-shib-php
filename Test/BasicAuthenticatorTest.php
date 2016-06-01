@@ -115,6 +115,12 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
     $expected_mkey = "authnContextClassRef=" . urlencode(BasicAuthenticator::UMN_MKEY_AUTHN_CONTEXT);
     $this->assertEquals($expected_mkey, substr($mkey_qs, 0, strlen($expected_mkey)), "The generated URL should begin with an encoded authnContextClass for MKEY");
 
+    // Duo option
+    $url = $shib->buildLoginURL(array('duo' => true));
+    $duo_qs = preg_replace('/^' . preg_quote($expected_base, '/') . '\?/', '', $url);
+    $expected_duo = "authnContextClassRef=" . urlencode(BasicAuthenticator::UMN_DUO_AUTHN_CONTEXT);
+    $this->assertEquals($expected_duo, substr($duo_qs, 0, strlen($expected_duo)), "The generated URL should begin with an encoded authnContextClass for Duo 2 factor");
+
     // Multiple options (explicit target and forceAuthn)
     $expected_base_alt = "https://{$this->http_host}{$this->alt_request_uri}";
     $expected_qs_target = "target=" . urlencode($expected_base_alt);
