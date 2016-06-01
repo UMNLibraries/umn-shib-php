@@ -237,7 +237,9 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     if ($options['logoutFromIdP']) {
       $logoutReturn = self::UMN_IDP_LOGOUT_URL;
 
-      // Append the urlencoded final return
+      // Append the urlencoded final return. The IdP does not handle an encoded final ?return=
+      // Examples in docs show a single-encoded final return
+      // https://wiki.umn.edu/ShibAuth/ShibLogout
       if (!empty($options['return'])) {
         $logoutReturn .= "?return={$options['return']}";
       }
