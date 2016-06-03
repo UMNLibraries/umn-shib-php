@@ -269,7 +269,6 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     if (!empty($query)) {
       $logoutURL .= "?$query";
     }
-    echo $logoutURL;
     return $logoutURL;
   }
   /**
