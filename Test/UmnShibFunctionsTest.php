@@ -97,7 +97,7 @@ class UmnShibFunctionsTest extends \PHPUnit_Framework_TestCase
     $return_url = "https://{$this->http_host}{$this->alt_request_uri}";
     $url = umnshib_buildLogoutURL(array('logoutFromIdP' => true, 'return' => $return_url));
 
-    $expected_return = "?return=" . urlencode(BasicAuthenticator::UMN_IDP_LOGOUT_URL . "?return={$return_url}");
+    $expected_return = "?return=" . urlencode(BasicAuthenticator::UMN_IDP_LOGOUT_URL . "?return=" . urlencode($return_url));
     $this->assertEquals($expected_return, substr($url, -strlen($expected_return)), "The generated URL should contain an encoded IdP logout with an additional encoded return URL inside it");
   }
 
