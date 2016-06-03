@@ -245,7 +245,8 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
       // Examples in docs show a single-encoded final return
       // https://wiki.umn.edu/ShibAuth/ShibLogout
       if (!empty($options['return'])) {
-        $logoutReturn .= "?return={$options['return']}";
+        //$logoutReturn .= "?return={$options['return']}";
+        $logoutReturn .= "?return=" . urlencode($options['return']);
       }
 
       // The whole return URL is encoded, including the secondary ?return=
@@ -268,6 +269,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
     if (!empty($query)) {
       $logoutURL .= "?$query";
     }
+    echo $logoutURL;
     return $logoutURL;
   }
   /**
