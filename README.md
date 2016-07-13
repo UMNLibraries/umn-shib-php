@@ -270,7 +270,7 @@ purposes, you may wish to inject an associative array of attributes. The
 constructor accepts as its 3rd parameter a `$sourceArray` for that purpose.
 
 ```php
-use UMNShib\Basic\ExtendedAuthenticator;
+use UMNShib\Basic\BasicAuthenticator;
 
 $alternateSource = array(
   'Shib-Identity-Provider' => 'https://example.edu/idp',
@@ -279,54 +279,6 @@ $alternateSource = array(
 
 // Pass the array source to the constructor
 $shib = new BasicAuthenticator($loginOptions, $logoutOptions, $alternateSource);
-```
-
-### Extended Features
-This package includes an `ExtendedAuthenticator` class with a few additional
-features not defined in the basic authenticator API.  In particular, it has
-methods to look for exact matches among multi-value attributes, and a parser for
-the `eduCourseMember` enrolled/instructor course definitions attribute.
-
-```php
-use UMNShib\Basic\ExtendedAuthenticator;
-
-$shib = new ExtendedAuthenticator();
-
-// Retrieve EduCourseMemberCourse objects for all courses
-$courses = $shib->getCourses();
-
-foreach ($coures as $course) {
-  if ($course->isStudent()) {
-    echo "User is enrolled as a student...";
-  }
-  else if ($course->isInstructor()) {
-    echo "User is assigned as an instructor...";
-  }
-
-  echo $course->getTerm();
-  echo $course->getSubject();
-  echo $course->getCourseNumber();
-  echo $course->getSection();
-
-  // Etc...
-  // See Util/EduCourseMemberCourse.php for available methods
-}
-```
-
-Check multi-value attributes by exact match or regular expression
-
-```php
-use UMNShib\Basic\ExtendedAuthenticator;
-
-$shib = new ExtendedAuthenticator();
-
-// $_SERVER['umnRole'] is tc.staff.lib.ABCD.EFGH;tc.dgre.ba.psych
-
-var_dump($shib->hasAttributeValue('umnRole', 'tc.staff.lib.ABCD.EFGH'));
-// bool(true)
-
-var_dump($shib->hasAttributeRegex('umnRole', '/.dgre.ba/'));
-// bool(true)
 ```
 
 ### Defining mock users
