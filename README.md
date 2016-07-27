@@ -27,6 +27,8 @@ Preferably you should be installing via [Composer](http://getcomposer.org).
 Add the following to your project's `composer.json` to attach it to this repo on
 `github.umn.edu` and load the package.
 
+
+####If you forked this from UMN GitHub:
 ```json
 "repositories": [
     {
@@ -35,7 +37,20 @@ Add the following to your project's `composer.json` to attach it to this repo on
     }
 ],
 "require": {
-    "umn-community-shib/basic-authenticator": ">=1.1.0"
+    "umn-community-shib/basic-authenticator": ">=1.7.0"
+}
+```
+
+####If you forked this from public github.com:
+```json
+"repositories": [
+    {
+        "type": "vcs",
+        "url": "https://github.com/UMNLibraries/umn-shib-php.git"
+    }
+],
+"require": {
+    "umn-community-shib/basic-authenticator": ">=1.7.0"
 }
 ```
 
