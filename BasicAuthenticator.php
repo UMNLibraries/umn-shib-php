@@ -21,8 +21,8 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   const UMN_TEST_IDP_ENTITY_ID = 'https://idp-test.shib.umn.edu/idp/shibboleth';
   const UMN_SPOOF_IDP_ENTITY_ID = 'https://idp-spoof-test.shib.umn.edu/idp/shibboleth';
 
-  const UMN_IDP_LOGOUT_URL = 'https://idp2.shib.umn.edu/idp/LogoutUMN';
-  const UMN_TEST_IDP_LOGOUT_URL = 'https://idp-test.shib.umn.edu/idp/LogoutUMN';
+  const UMN_IDP_LOGOUT_URL = 'https://login.umn.edu/idp/LogoutUMN';
+  const UMN_TEST_IDP_LOGOUT_URL = 'https://login-test.umn.edu/idp/LogoutUMN';
   const UMN_SPOOF_IDP_LOGOUT_URL = 'https://idp-spoof-test.shib.umn.edu/idp/LogoutUMN';
 
   const UMN_MKEY_AUTHN_CONTEXT = 'https://www.umn.edu/shibboleth/classes/authncontext/mkey';
