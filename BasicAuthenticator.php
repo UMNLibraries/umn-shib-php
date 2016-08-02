@@ -23,7 +23,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
 
   const UMN_IDP_LOGOUT_URL = 'https://login.umn.edu/idp/LogoutUMN';
   const UMN_TEST_IDP_LOGOUT_URL = 'https://login-test.umn.edu/idp/LogoutUMN';
-  const UMN_SPOOF_IDP_LOGOUT_URL = 'https://idp-spoof-test.shib.umn.edu/idp/LogoutUMN';
+  const UMN_SPOOF_IDP_LOGOUT_URL = 'https://login-test-spoof.umn.edu/idp/LogoutUMN';
 
   const UMN_MKEY_AUTHN_CONTEXT = 'https://www.umn.edu/shibboleth/classes/authncontext/mkey';
   const UMN_DUO_AUTHN_CONTEXT = 'https://www.umn.edu/shibboleth/classes/authncontext/duo';
