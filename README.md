@@ -37,7 +37,7 @@ Add the following to your project's `composer.json` to attach it to this repo on
     }
 ],
 "require": {
-    "umn-community-shib/basic-authenticator": ">=1.7.0"
+    "umn-community-shib/basic-authenticator": ">=1.8.0"
 }
 ```
 
@@ -50,7 +50,7 @@ Add the following to your project's `composer.json` to attach it to this repo on
     }
 ],
 "require": {
-    "umn-community-shib/basic-authenticator": ">=1.7.0"
+    "umn-community-shib/basic-authenticator": ">=1.8.0"
 }
 ```
 
@@ -61,6 +61,11 @@ necessary files. _This is not really supported, but will work if you manually
 require_once '/path/to/umnshib/BasicAuthenticator.php';
 // If you plan to use user mocking, you'll need this too.
 require_once '/path/to/umnshib/Mock/UserFactory.php';
+
+#### Notes about IdPv2 vs IdPv3
+Fall 2016 brought an update to version 3 of the Shibboleth IdP, which lives on 
+different hostnames. You MUST upgrade to 1.8.0 if you use the `logoutFromIdP` 
+option.
 
 ## Basic Object-oriented or Procedural Usage
 Like many modern PHP libraries aiming to provide backward compatibility and ease
