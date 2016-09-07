@@ -77,7 +77,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
   protected $logoutOptions = array(
     'return' => null,
     'logoutFromIdP' => true,
-    'IdPLogoutURL' => self::UMN_IDP_ENTITY_ID
+    'IdPLogoutURL' => self::UMN_IDP_LOGOUT_URL
   );
   /**
    * Custom IdP entity ID used when checking session status
@@ -239,7 +239,7 @@ class BasicAuthenticator implements BasicAuthenticatorInterface
 
     $params = array();
     if ($options['logoutFromIdP']) {
-      $logoutReturn = self::UMN_IDP_LOGOUT_URL;
+      $logoutReturn = $options['IdPLogoutURL'];
 
       // Append the urlencoded final return.
       // Examples in docs show a single-encoded final return, but to spec it should be encoded

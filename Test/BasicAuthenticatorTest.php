@@ -83,7 +83,7 @@ class BasicAuthenticatorTest extends \PHPUnit_Framework_TestCase
     $expected_logout_options = array(
       'return' => 'http://www.example.com',
       'logoutFromIdP' => false,
-      'IdPLogoutURL' => BasicAuthenticator::UMN_IDP_ENTITY_ID,
+      'IdPLogoutURL' => BasicAuthenticator::UMN_IDP_LOGOUT_URL,
       'otherOption' => true
     );
     $shib = new BasicAuthenticator(null, $input_logout_options);
