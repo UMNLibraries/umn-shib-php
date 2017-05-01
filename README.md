@@ -1,6 +1,6 @@
-#BasicAuthenticator Implementation for PHP
+# BasicAuthenticator Implementation for PHP
 
-##Description
+## Description
 This is a PHP implementation of the [UMN Community Shibboleth BasicAuthenticator
 API](https://github.umn.edu/umn-community-shib/umn-shib-api).
 
@@ -28,7 +28,7 @@ Add the following to your project's `composer.json` to attach it to this repo on
 `github.umn.edu` and load the package.
 
 
-####If you forked this from UMN GitHub:
+#### If you forked this from UMN GitHub:
 ```json
 "repositories": [
     {
@@ -41,7 +41,7 @@ Add the following to your project's `composer.json` to attach it to this repo on
 }
 ```
 
-####If you forked this from public github.com:
+#### If you forked this from public github.com:
 ```json
 "repositories": [
     {
@@ -58,9 +58,11 @@ If you are not using Composer, you can still use it by manually including the
 necessary files. _This is not really supported, but will work if you manually
 `include/require` all the necessary files_.
 
+```php
 require_once '/path/to/umnshib/BasicAuthenticator.php';
 // If you plan to use user mocking, you'll need this too.
 require_once '/path/to/umnshib/Mock/UserFactory.php';
+```
 
 #### Notes about IdPv2 vs IdPv3
 Fall 2016 brought an update to version 3 of the Shibboleth IdP, which lives on 
